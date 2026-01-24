@@ -154,7 +154,13 @@ paths:
               max_tokens: 4096
               messages:
                 - role: user
-                  content: "你好，介绍一下你自己"
+                  content:
+                    - type: image
+                      source:
+                        type: url
+                        url: "https://example.com/image.jpg"
+                    - type: text
+                      text: "请描述这张图片"
       responses:
         "200":
           description: 生成成功
