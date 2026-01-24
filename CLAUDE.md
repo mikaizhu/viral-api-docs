@@ -48,6 +48,45 @@
 - 错误响应使用 `$ref: '#/components/responses/...'` 引用，保持 DRY
 - 请求体必须有 `example`（单数）以生成 curl 示例
 
+### GitBook OpenAPI 渲染限制（重要）
+
+GitBook 的 OpenAPI 渲染器对 `description` 字段有严格限制：
+
+**不支持的 Markdown 语法**（会被当纯文本显示）：
+- `###` 标题
+- ` ``` ` 代码块
+- `[text](url)` Markdown 链接
+- `>` 引用块
+- `- item` 列表格式
+
+**支持的格式**：
+- 纯文本描述（推荐）
+- 纯文本 URL 会被自动识别为可点击超链接
+
+**description 字段写法示例**：
+
+```yaml
+# 正确 — 纯文本，简洁
+description: 创建异步图像生成任务，返回 task_id 用于后续查询。
+
+# 正确 — 纯 URL 会自动变超链接
+description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+
+# 错误 — Markdown 链接不渲染
+description: 获取 API Key：[ViralAPI 控制台](https://viralapi.ai/api-key)
+
+# 错误 — 标题和列表不渲染
+description: |
+  ### 任务状态
+  - pending — 排队
+  - completed — 完成
+```
+
+**其他限制**：
+- `x-codeSamples` 扩展字段不被 GitBook 支持（不会改变代码示例）
+- 代码示例语言选择器顺序固定为 HTTP → cURL → JavaScript → Python，无法通过配置改变
+- 代码示例内容由 `requestBody.content.application/json.example` 自动生成
+
 ### GitBook 页面约定
 
 API Reference 页面格式固定：
@@ -69,8 +108,8 @@ API Reference 页面格式固定：
 
 ### 分类规则
 
+- **Task Management**（放在最前面） — 任务查询等通用操作
 - **Image Models** — 所有图像生成/编辑模型（NanoBanana、NanoBanana Pro、未来新增的图像模型）
-- **Task Management** — 任务查询等通用操作
 - 未来如有文本/音频/视频模型，按类型新增分类（Text Models、Audio Models 等）
 
 ### SUMMARY.md
@@ -78,6 +117,7 @@ API Reference 页面格式固定：
 - 每次新增或删除页面时必须同步更新 `SUMMARY.md`
 - 路径相对于项目根目录
 - GitBook 依赖此文件生成导航
+- 导航标题不要使用横杠 `—`，直接用空格分隔（如 `NanoBanana Text to Image`）
 
 ## 添加新模型/端点的步骤
 
@@ -101,6 +141,9 @@ API Reference 页面格式固定：
 - 不要在 Markdown 中手动粘贴 OpenAPI JSON/YAML 代码块来"展示"接口
 - 不要合并多个模型到同一个 OpenAPI 文件（会产生路径冲突）
 - 不要在 `{% openapi %}` 块内添加额外内容
+- 不要在 OpenAPI description 字段中使用 Markdown 标题、代码块、链接、引用块、列表（不会渲染）
+- 不要使用 `x-codeSamples` 扩展（GitBook 不支持）
+- 不要在 SUMMARY.md 的导航标题中使用 `—` 横杠
 
 ## Git 工作流
 
