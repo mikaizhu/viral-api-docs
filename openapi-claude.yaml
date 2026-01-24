@@ -1,0 +1,316 @@
+openapi: 3.0.3
+info:
+  title: Claude API
+  description: Claude 原生 API 接口，支持文本生成、多轮对话、图片理解等多模态能力。支持流式和非流式两种输出模式。
+  version: 1.0.0
+  contact:
+    name: ViralAPI Support
+    url: https://viralapi.ai/api-key
+
+servers:
+  - url: https://viralapi.ai
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Claude
+    description: Claude 原生 API，支持多模态内容生成
+
+paths:
+  /v1/messages:
+    post:
+      tags:
+        - Claude
+      summary: Create Message
+      description: 创建对话消息，支持文本、图片等多模态输入。通过 stream 参数控制是否流式输出。
+      operationId: createMessage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: anthropic-version
+          in: header
+          required: true
+          description: API 版本号，必须设置为 2023-06-01
+          schema:
+            type: string
+            enum:
+              - "2023-06-01"
+          example: "2023-06-01"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - max_tokens
+                - messages
+              properties:
+                model:
+                  type: string
+                  description: 模型名称
+                  enum:
+                    - claude-opus-4-20250514
+                    - claude-sonnet-4-20250514
+                    - claude-3-5-sonnet-20241022
+                    - claude-3-5-haiku-20241022
+                  example: claude-3-5-sonnet-20241022
+                max_tokens:
+                  type: integer
+                  description: 最大输出 token 数（必填）
+                  minimum: 1
+                  maximum: 8192
+                  example: 4096
+                messages:
+                  type: array
+                  description: 对话消息数组
+                  items:
+                    type: object
+                    required:
+                      - role
+                      - content
+                    properties:
+                      role:
+                        type: string
+                        description: 角色标识，user 表示用户，assistant 表示助手回复
+                        enum:
+                          - user
+                          - assistant
+                      content:
+                        oneOf:
+                          - type: string
+                            description: 纯文本内容
+                          - type: array
+                            description: 多模态内容数组（文本+图片）
+                            items:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - text
+                                    - image
+                                text:
+                                  type: string
+                                  description: 文本内容（type 为 text 时）
+                                source:
+                                  type: object
+                                  description: 图片来源（type 为 image 时）
+                                  properties:
+                                    type:
+                                      type: string
+                                      enum:
+                                        - base64
+                                        - url
+                                    media_type:
+                                      type: string
+                                      description: 图片 MIME 类型（base64 方式时需要）
+                                      enum:
+                                        - image/jpeg
+                                        - image/png
+                                        - image/gif
+                                        - image/webp
+                                    data:
+                                      type: string
+                                      description: Base64 编码的图片数据（base64 方式时）
+                                    url:
+                                      type: string
+                                      description: 图片 URL（url 方式时）
+                system:
+                  type: string
+                  description: 系统提示词
+                  example: "你是一个专业的翻译助手。"
+                temperature:
+                  type: number
+                  description: 温度值 (0-1)，越高输出越随机
+                  minimum: 0
+                  maximum: 1
+                  default: 1.0
+                  example: 0.7
+                top_p:
+                  type: number
+                  description: Nucleus sampling 参数
+                  minimum: 0
+                  maximum: 1
+                top_k:
+                  type: integer
+                  description: Top-k sampling 参数
+                  minimum: 1
+                stream:
+                  type: boolean
+                  description: 是否启用流式输出
+                  default: false
+                  example: false
+                stop_sequences:
+                  type: array
+                  description: 停止序列
+                  items:
+                    type: string
+            example:
+              model: claude-3-5-sonnet-20241022
+              max_tokens: 4096
+              messages:
+                - role: user
+                  content: "你好，介绍一下你自己"
+      responses:
+        "200":
+          description: 生成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+              example:
+                id: "msg_01XFDUDYJgAACzvnptvVoYEL"
+                type: message
+                role: assistant
+                content:
+                  - type: text
+                    text: "你好！我是 Claude，一个由 Anthropic 开发的 AI 助手。我可以帮助你完成各种任务，包括回答问题、分析内容、编写代码等。有什么我可以帮助你的吗？"
+                model: claude-3-5-sonnet-20241022
+                stop_reason: end_turn
+                usage:
+                  input_tokens: 12
+                  output_tokens: 85
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+
+  schemas:
+    MessageResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 消息 ID
+          example: "msg_01XFDUDYJgAACzvnptvVoYEL"
+        type:
+          type: string
+          description: 响应类型
+          enum:
+            - message
+          example: message
+        role:
+          type: string
+          description: 角色，固定为 assistant
+          enum:
+            - assistant
+          example: assistant
+        content:
+          type: array
+          description: 响应内容数组
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                  - text
+              text:
+                type: string
+                description: 生成的文本内容
+        model:
+          type: string
+          description: 使用的模型名称
+          example: claude-3-5-sonnet-20241022
+        stop_reason:
+          type: string
+          description: 停止原因
+          enum:
+            - end_turn
+            - max_tokens
+            - stop_sequence
+          example: end_turn
+        usage:
+          type: object
+          description: Token 使用统计
+          properties:
+            input_tokens:
+              type: integer
+              description: 输入 token 数
+            output_tokens:
+              type: integer
+              description: 输出 token 数
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - error
+      properties:
+        code:
+          type: integer
+          description: HTTP 状态码
+        error:
+          type: object
+          required:
+            - message
+            - type
+          properties:
+            message:
+              type: string
+              description: 错误描述
+            type:
+              type: string
+              description: 错误类型标识
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 400
+            error:
+              message: "Invalid request parameters"
+              type: invalid_request_error
+    Unauthorized:
+      description: 认证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 401
+            error:
+              message: "Invalid or missing API key"
+              type: authentication_error
+    Forbidden:
+      description: 权限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 403
+            error:
+              message: "Access denied for this model"
+              type: permission_error
+    ServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 500
+            error:
+              message: "Internal server error"
+              type: server_error
