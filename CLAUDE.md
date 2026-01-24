@@ -21,12 +21,15 @@
 ├── async-workflow.md                 # 异步任务工作流
 ├── openapi-nanobanana.yaml           # NanoBanana (gemini-2.5-flash-image) 的 OpenAPI 规范
 ├── openapi-nanobanana-pro.yaml       # NanoBanana Pro (gemini-3-pro-image-preview) 的 OpenAPI 规范
+├── openapi-gemini.yaml               # Gemini Native API 的 OpenAPI 规范
 └── api-reference/                    # API 文档页面
+    ├── query-task.md
+    ├── gemini-generate-content.md
+    ├── gemini-stream-generate-content.md
     ├── nanobanana-text-to-image.md
     ├── nanobanana-image-edit.md
     ├── nanobanana-pro-text-to-image.md
-    ├── nanobanana-pro-image-edit.md
-    └── query-task.md
+    └── nanobanana-pro-image-edit.md
 ```
 
 ## 关键规则
@@ -45,6 +48,7 @@
 - 每个模型一个独立 YAML 文件，避免路径冲突
 - `openapi-nanobanana.yaml` 包含：`POST /v1/task/create`、`POST /v1/task/create-image-edit`
 - `openapi-nanobanana-pro.yaml` 包含：`POST /v1/task/create`、`POST /v1/task/create-image-edit`、`GET /v1/task/query`
+- `openapi-gemini.yaml` 包含：`POST /v1beta/models/{model}:generateContent`、`POST /v1beta/models/{model}:streamGenerateContent`（Gemini 原生 API，服务器为 xingjiabiapi.org）
 - 错误响应使用 `$ref: '#/components/responses/...'` 引用，保持 DRY
 - 请求体必须有 `example`（单数）以生成 curl 示例
 
@@ -109,8 +113,9 @@ API Reference 页面格式固定：
 ### 分类规则
 
 - **Task Management**（放在最前面） — 任务查询等通用操作
+- **Chat Models** — 文本对话、多模态理解模型（Gemini Native API 等）
 - **Image Models** — 所有图像生成/编辑模型（NanoBanana、NanoBanana Pro、未来新增的图像模型）
-- 未来如有文本/音频/视频模型，按类型新增分类（Text Models、Audio Models 等）
+- 未来如有音频/视频模型，按类型新增分类（Audio Models、Video Models 等）
 
 ### SUMMARY.md
 

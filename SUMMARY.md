@@ -14,6 +14,11 @@
 
 * [Query Task Status](api-reference/query-task.md)
 
+### Chat Models
+
+* [Gemini Generate Content](api-reference/gemini-generate-content.md)
+* [Gemini Stream Generate Content](api-reference/gemini-stream-generate-content.md)
+
 ### Image Models
 
 * [NanoBanana Text to Image](api-reference/nanobanana-text-to-image.md)
