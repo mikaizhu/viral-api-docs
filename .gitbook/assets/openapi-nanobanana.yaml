@@ -1,0 +1,358 @@
+openapi: 3.0.3
+info:
+  title: NanoBanana API
+  description: NanoBanana (gemini-2.5-flash-image) 快速高效的 AI 图像生成模型。工作流程：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果。文生图和图像编辑均使用同一端点，通过 input.image_urls 参数区分模式。
+  version: 1.0.0
+  contact:
+    name: ViralAPI Support
+    url: https://viralapi.ai/api-key
+
+servers:
+  - url: https://viralapi.ai
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: NanoBanana
+    description: "模型：`gemini-2.5-flash-image` — 快速生成"
+
+paths:
+  /v1/task/create:
+    post:
+      tags:
+        - NanoBanana
+      summary: NanoBanana Text to Image
+      description: 创建异步图像生成任务，返回 task_id 用于后续查询。
+      operationId: createTaskNanoBanana
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - task_type
+                - input
+              properties:
+                model:
+                  type: string
+                  description: 模型名称，必须设置为 `gemini-2.5-flash-image`
+                  enum:
+                    - gemini-2.5-flash-image
+                task_type:
+                  type: string
+                  description: 任务类型，必须设置为 `image`
+                  enum:
+                    - image
+                input:
+                  type: object
+                  required:
+                    - prompt
+                  description: 输入参数
+                  properties:
+                    prompt:
+                      type: string
+                      description: 图像生成的提示词
+                      minLength: 1
+                      maxLength: 4096
+                      example: "A serene mountain landscape at sunset with vibrant colors"
+                    aspect_ratio:
+                      type: string
+                      description: 图像宽高比，默认为 `auto`
+                      default: "auto"
+                      enum:
+                        - "auto"
+                        - "1:1"
+                        - "2:3"
+                        - "3:2"
+                        - "3:4"
+                        - "4:3"
+                        - "4:5"
+                        - "5:4"
+                        - "9:16"
+                        - "16:9"
+                        - "21:9"
+            example:
+              model: gemini-2.5-flash-image
+              task_type: image
+              input:
+                prompt: "A serene mountain landscape at sunset with vibrant colors"
+                aspect_ratio: "16:9"
+      responses:
+        "200":
+          description: 任务创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTaskResponse'
+              example:
+                code: 200
+                msg: success
+                data:
+                  task_id: "task_nanobanana_1765178625768"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "402":
+          $ref: '#/components/responses/PaymentRequired'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+        "502":
+          $ref: '#/components/responses/BadGateway'
+
+  /v1/task/create-image-edit:
+    post:
+      tags:
+        - NanoBanana
+      summary: NanoBanana Image Edit
+      description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
+      operationId: createImageEditTaskNanoBanana
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - task_type
+                - input
+              properties:
+                model:
+                  type: string
+                  description: 模型名称，必须设置为 `gemini-2.5-flash-image`
+                  enum:
+                    - gemini-2.5-flash-image
+                task_type:
+                  type: string
+                  description: 任务类型，必须设置为 `image`
+                  enum:
+                    - image
+                input:
+                  type: object
+                  required:
+                    - prompt
+                    - image_urls
+                  description: 输入参数
+                  properties:
+                    prompt:
+                      type: string
+                      description: 图像编辑的提示词，描述如何转换参考图像
+                      minLength: 1
+                      maxLength: 4096
+                      example: "Transform this into a watercolor painting style"
+                    image_urls:
+                      type: array
+                      description: 输入图像的 URL 数组，最多支持 10 张图片
+                      items:
+                        type: string
+                        format: uri
+                      minItems: 1
+                      maxItems: 10
+                      example:
+                        - "https://example.com/input-image.jpg"
+                    aspect_ratio:
+                      type: string
+                      description: 图像宽高比，默认为 `auto`
+                      default: "auto"
+                      enum:
+                        - "auto"
+                        - "1:1"
+                        - "2:3"
+                        - "3:2"
+                        - "3:4"
+                        - "4:3"
+                        - "4:5"
+                        - "5:4"
+                        - "9:16"
+                        - "16:9"
+                        - "21:9"
+            example:
+              model: gemini-2.5-flash-image
+              task_type: image
+              input:
+                prompt: "Transform this into a watercolor painting style"
+                image_urls:
+                  - "https://example.com/input-image.jpg"
+                aspect_ratio: "1:1"
+      responses:
+        "200":
+          description: 任务创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTaskResponse'
+              example:
+                code: 200
+                msg: success
+                data:
+                  task_id: "task_nanobanana_1765178625768"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "402":
+          $ref: '#/components/responses/PaymentRequired'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+        "502":
+          $ref: '#/components/responses/BadGateway'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+
+  schemas:
+    CreateTaskResponse:
+      type: object
+      required:
+        - code
+        - msg
+        - data
+      properties:
+        code:
+          type: integer
+          description: 业务状态码
+          enum: [200]
+          example: 200
+        msg:
+          type: string
+          description: 状态消息
+          example: "success"
+        data:
+          type: object
+          required:
+            - task_id
+          properties:
+            task_id:
+              type: string
+              description: 异步任务 ID，用于查询任务状态
+              example: "task_nanobanana_1765178625768"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+            - type
+          properties:
+            code:
+              type: integer
+              description: HTTP 状态码
+            message:
+              type: string
+              description: 错误描述
+            type:
+              type: string
+              description: 错误类型标识
+            param:
+              type: string
+              description: 导致错误的参数名称（可选）
+            fallback_suggestion:
+              type: string
+              description: 建议的替代方案（可选）
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 400
+              message: "Invalid request parameters"
+              type: invalid_request_error
+    Unauthorized:
+      description: 认证失败 — Token 缺失或无效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 401
+              message: "Invalid or expired token"
+              type: authentication_error
+    PaymentRequired:
+      description: 余额不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 402
+              message: "Insufficient account balance"
+              type: payment_required
+    Forbidden:
+      description: 权限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 403
+              message: "Access denied for this model"
+              type: permission_error
+              param: model
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 404
+              message: "Resource not found"
+              type: not_found_error
+    ServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 500
+              message: "Internal server error, please try again later"
+              type: server_error
+    BadGateway:
+      description: 网关错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: 502
+              message: "Gateway error, server temporarily unavailable"
+              type: bad_gateway

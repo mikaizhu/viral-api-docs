@@ -4,5 +4,6 @@ Edit existing images with high quality using the `gemini-3-pro-image-preview` mo
 
 > **Note**: The actual API endpoint is `POST /v1/task/create`. Providing `image_urls` in the input switches to image editing mode.
 
-{% openapi src="../openapi-nanobanana-pro.yaml" path="/v1/task/create-image-edit" method="post" %}
+{% openapi src="../.gitbook/assets/openapi-nanobanana-pro.yaml" path="/v1/task/create-image-edit" method="post" %}
+[openapi-nanobanana-pro.yaml](../.gitbook/assets/openapi-nanobanana-pro.yaml)
 {% endopenapi %}
