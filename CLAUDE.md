@@ -57,12 +57,38 @@ API Reference 页面格式固定：
 
 简短描述（1-2 句）
 
+> **Note**: 虚拟路径说明（如适用）
+
 {% openapi src="../openapi-xxx.yaml" path="/v1/..." method="post" %}
 {% endopenapi %}
+
+---
+
+## Try It
+
+### curl
+
+（完整可运行的 curl 示例，使用真实端点 /v1/task/create）
+
+### Python
+
+（requests 库示例）
+
+### Node.js
+
+（fetch 示例）
 ```
 
 - 不要在 `{% openapi %}` 块外手动写参数表格（OpenAPI 会自动渲染）
-- 可以在块外添加使用注意事项（如虚拟路径说明）
+- 每个 API 页面必须包含 "Try It" 部分（curl + Python + Node.js）
+- Try It 中的 URL 必须是**真实端点**（`/v1/task/create`），不是虚拟路径
+- 可以在 openapi 块上方添加使用注意事项（如虚拟路径说明）
+
+### 分类规则
+
+- **Image Models** — 所有图像生成/编辑模型（NanoBanana、NanoBanana Pro、未来新增的图像模型）
+- **Task Management** — 任务查询等通用操作
+- 未来如有文本/音频/视频模型，按类型新增分类（Text Models、Audio Models 等）
 
 ### SUMMARY.md
 
@@ -73,8 +99,8 @@ API Reference 页面格式固定：
 ## 添加新模型/端点的步骤
 
 1. 创建新的 `openapi-<model-name>.yaml`
-2. 创建对应的 `api-reference/<model-name>-<operation>.md`
-3. 在 `SUMMARY.md` 中添加导航条目
+2. 创建对应的 `api-reference/<model-name>-<operation>.md`（包含 openapi 块 + Try It 示例）
+3. 在 `SUMMARY.md` 中按模型类型分类添加导航条目（Image Models / Text Models 等）
 4. 如果是新的任务类型，更新 `getting-started.md` 和 `async-workflow.md` 的示例
 
 ## 编写标准
