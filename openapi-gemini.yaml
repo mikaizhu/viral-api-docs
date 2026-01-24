@@ -352,18 +352,18 @@ components:
     ErrorResponse:
       type: object
       required:
+        - code
         - error
       properties:
+        code:
+          type: integer
+          description: HTTP 状态码
         error:
           type: object
           required:
-            - code
             - message
             - status
           properties:
-            code:
-              type: integer
-              description: HTTP 状态码
             message:
               type: string
               description: 错误描述
@@ -379,8 +379,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
+            code: 400
             error:
-              code: 400
               message: "Invalid request parameters"
               status: INVALID_ARGUMENT
     Unauthorized:
@@ -390,8 +390,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
+            code: 401
             error:
-              code: 401
               message: "Invalid or missing API key"
               status: UNAUTHENTICATED
     Forbidden:
@@ -401,8 +401,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
+            code: 403
             error:
-              code: 403
               message: "Access denied for this model"
               status: PERMISSION_DENIED
     ServerError:
@@ -412,7 +412,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
+            code: 500
             error:
-              code: 500
               message: "Internal server error"
               status: INTERNAL

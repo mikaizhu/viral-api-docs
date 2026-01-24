@@ -24,8 +24,7 @@
 ├── openapi-gemini.yaml               # Gemini Native API 的 OpenAPI 规范
 └── api-reference/                    # API 文档页面
     ├── query-task.md
-    ├── gemini-generate-content.md
-    ├── gemini-stream-generate-content.md
+    ├── gemini-native-api.md
     ├── nanobanana-text-to-image.md
     ├── nanobanana-image-edit.md
     ├── nanobanana-pro-text-to-image.md

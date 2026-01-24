@@ -12,6 +12,10 @@
 
 * [Query Task Status](api-reference/query-task.md)
 
+## Chat Models
+
+* [Gemini Native API](api-reference/gemini-native-api.md)
+
 ## Image Models
 
 * [NanoBanana Text to Image](api-reference/nanobanana-text-to-image.md)
