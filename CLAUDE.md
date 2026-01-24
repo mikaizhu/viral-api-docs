@@ -47,7 +47,7 @@
 - 每个模型一个独立 YAML 文件，避免路径冲突
 - `openapi-nanobanana.yaml` 包含：`POST /v1/task/create`、`POST /v1/task/create-image-edit`
 - `openapi-nanobanana-pro.yaml` 包含：`POST /v1/task/create`、`POST /v1/task/create-image-edit`、`GET /v1/task/query`
-- `openapi-gemini.yaml` 包含：`POST /v1beta/models/{model}:generateContent`、`POST /v1beta/models/{model}:streamGenerateContent`（Gemini 原生 API，服务器为 xingjiabiapi.org）
+- `openapi-gemini.yaml` 包含：`POST /v1beta/models/{model}:generateContent`、`POST /v1beta/models/{model}:streamGenerateContent`（Gemini 原生 API）
 - 错误响应使用 `$ref: '#/components/responses/...'` 引用，保持 DRY
 - 请求体必须有 `example`（单数）以生成 curl 示例
 
