@@ -26,20 +26,6 @@ paths:
       summary: NanoBanana Text to Image
       description: 创建异步图像生成任务，返回 task_id 用于后续查询。
       operationId: createTaskNanoBanana
-      x-codeSamples:
-        - lang: cURL
-          source: |
-            curl -X POST https://viralapi.ai/v1/task/create \
-              -H "Authorization: Bearer YOUR_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "model": "gemini-2.5-flash-image",
-                "task_type": "image",
-                "input": {
-                  "prompt": "A serene mountain landscape at sunset with vibrant colors",
-                  "aspect_ratio": "16:9"
-                }
-              }'
       security:
         - BearerAuth: []
       requestBody:
@@ -131,21 +117,6 @@ paths:
       summary: NanoBanana Image Edit
       description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
       operationId: createImageEditTaskNanoBanana
-      x-codeSamples:
-        - lang: cURL
-          source: |
-            curl -X POST https://viralapi.ai/v1/task/create \
-              -H "Authorization: Bearer YOUR_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "model": "gemini-2.5-flash-image",
-                "task_type": "image",
-                "input": {
-                  "prompt": "Transform this into a watercolor painting style",
-                  "image_urls": ["https://example.com/input-image.jpg"],
-                  "aspect_ratio": "1:1"
-                }
-              }'
       security:
         - BearerAuth: []
       requestBody:

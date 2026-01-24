@@ -28,21 +28,6 @@ paths:
       summary: NanoBanana Pro Text to Image
       description: 创建异步图像生成任务，返回 task_id 用于后续查询。相比 NanoBanana，Pro 模型额外支持 image_size 参数（1K/2K/4K）。
       operationId: createTaskNanoBananaPro
-      x-codeSamples:
-        - lang: cURL
-          source: |
-            curl -X POST https://viralapi.ai/v1/task/create \
-              -H "Authorization: Bearer YOUR_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "model": "gemini-3-pro-image-preview",
-                "task_type": "image",
-                "input": {
-                  "prompt": "A futuristic banana with neon lights in a cyberpunk city",
-                  "image_size": "2K",
-                  "aspect_ratio": "9:16"
-                }
-              }'
       security:
         - BearerAuth: []
       requestBody:
@@ -143,22 +128,6 @@ paths:
       summary: NanoBanana Pro Image Edit
       description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
       operationId: createImageEditTaskNanoBananaPro
-      x-codeSamples:
-        - lang: cURL
-          source: |
-            curl -X POST https://viralapi.ai/v1/task/create \
-              -H "Authorization: Bearer YOUR_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "model": "gemini-3-pro-image-preview",
-                "task_type": "image",
-                "input": {
-                  "prompt": "Transform this into a cyberpunk style with neon lights",
-                  "image_urls": ["https://example.com/input-image.jpg"],
-                  "image_size": "2K",
-                  "aspect_ratio": "9:16"
-                }
-              }'
       security:
         - BearerAuth: []
       requestBody:
@@ -272,11 +241,6 @@ paths:
       summary: Query Task Status
       description: 根据 task_id 查询异步任务的执行状态和结果。任务状态流转为 pending → processing → completed/failed。建议轮询间隔 2-5 秒，当 status 为 completed 或 failed 时停止轮询。图片链接有效期 24 小时，请及时下载。
       operationId: queryTask
-      x-codeSamples:
-        - lang: cURL
-          source: |
-            curl -X GET "https://viralapi.ai/v1/task/query?task_id=task_nano-banana-pro_1765178625768" \
-              -H "Authorization: Bearer YOUR_API_KEY"
       security:
         - BearerAuth: []
       parameters:
