@@ -1,16 +1,7 @@
 openapi: 3.0.3
 info:
   title: NanoBanana API
-  description: |
-    NanoBanana（模型：`gemini-2.5-flash-image`）— 快速高效的 AI 图像生成模型。
-
-    ## 工作流程
-
-    1. **创建任务** — 调用 `POST /v1/task/create`，获取 `task_id`
-    2. **轮询查询** — 调用 `GET /v1/task/query?task_id=xxx` 查询状态
-    3. **获取结果** — 当 `status` 为 `completed` 时，从 `results` 数组获取图片 URL
-
-    > **注意**：文生图和图像编辑均使用 `POST /v1/task/create` 端点，通过 `input.image_urls` 参数区分模式。
+  description: NanoBanana (gemini-2.5-flash-image) 快速高效的 AI 图像生成模型。工作流程：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果。文生图和图像编辑均使用同一端点，通过 input.image_urls 参数区分模式。
   version: 1.0.0
   contact:
     name: ViralAPI Support
@@ -33,8 +24,7 @@ paths:
       tags:
         - NanoBanana
       summary: NanoBanana Text to Image
-      description: |
-        创建异步图像生成任务，返回 `task_id` 用于后续查询。
+      description: 创建异步图像生成任务，返回 task_id 用于后续查询。
       operationId: createTaskNanoBanana
       security:
         - BearerAuth: []
@@ -125,10 +115,7 @@ paths:
       tags:
         - NanoBanana
       summary: NanoBanana Image Edit
-      description: |
-        基于参考图像创建异步图像编辑任务，返回 `task_id` 用于后续查询。
-
-        > **注意**：实际 API 端点为 `POST /v1/task/create`，通过传入 `image_urls` 参数切换为图像编辑模式。
+      description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
       operationId: createImageEditTaskNanoBanana
       security:
         - BearerAuth: []
@@ -233,10 +220,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: |
-        使用 Bearer Token 进行认证。
-
-        获取 API Key：[ViralAPI 控制台](https://viralapi.ai/api-key)
+      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
 
   schemas:
     CreateTaskResponse:

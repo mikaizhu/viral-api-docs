@@ -1,16 +1,7 @@
 openapi: 3.0.3
 info:
   title: NanoBanana Pro API
-  description: |
-    NanoBanana Pro（模型：`gemini-3-pro-image-preview`）— 高质量 AI 图像生成模型，支持 1K/2K/4K 分辨率。
-
-    ## 工作流程
-
-    1. **创建任务** — 调用 `POST /v1/task/create`，获取 `task_id`
-    2. **轮询查询** — 调用 `GET /v1/task/query?task_id=xxx` 查询状态
-    3. **获取结果** — 当 `status` 为 `completed` 时，从 `results` 数组获取图片 URL
-
-    > **注意**：文生图和图像编辑均使用 `POST /v1/task/create` 端点，通过 `input.image_urls` 参数区分模式。
+  description: NanoBanana Pro (gemini-3-pro-image-preview) 高质量 AI 图像生成模型，支持 1K/2K/4K 分辨率。工作流程：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果。文生图和图像编辑均使用同一端点，通过 input.image_urls 参数区分模式。
   version: 1.0.0
   contact:
     name: ViralAPI Support
@@ -35,10 +26,7 @@ paths:
       tags:
         - NanoBanana Pro
       summary: NanoBanana Pro Text to Image
-      description: |
-        创建异步图像生成任务，返回 `task_id` 用于后续查询。
-
-        相比 NanoBanana，Pro 模型额外支持 `image_size` 参数（1K/2K/4K）。
+      description: 创建异步图像生成任务，返回 task_id 用于后续查询。相比 NanoBanana，Pro 模型额外支持 image_size 参数（1K/2K/4K）。
       operationId: createTaskNanoBananaPro
       security:
         - BearerAuth: []
@@ -77,11 +65,7 @@ paths:
                       example: "A futuristic banana with neon lights in a cyberpunk city"
                     image_size:
                       type: string
-                      description: |
-                        输出图像分辨率：
-                        - `1K` — 1024px（默认）
-                        - `2K` — 2048px
-                        - `4K` — 4096px
+                      description: 输出图像分辨率，可选 1K (1024px, 默认)、2K (2048px)、4K (4096px)
                       default: "1K"
                       enum:
                         - "1K"
@@ -142,10 +126,7 @@ paths:
       tags:
         - NanoBanana Pro
       summary: NanoBanana Pro Image Edit
-      description: |
-        基于参考图像创建异步图像编辑任务，返回 `task_id` 用于后续查询。
-
-        > **注意**：实际 API 端点为 `POST /v1/task/create`，通过传入 `image_urls` 参数切换为图像编辑模式。
+      description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
       operationId: createImageEditTaskNanoBananaPro
       security:
         - BearerAuth: []
@@ -195,11 +176,7 @@ paths:
                         - "https://example.com/input-image.jpg"
                     image_size:
                       type: string
-                      description: |
-                        输出图像分辨率：
-                        - `1K` — 1024px（默认）
-                        - `2K` — 2048px
-                        - `4K` — 4096px
+                      description: 输出图像分辨率，可选 1K (1024px, 默认)、2K (2048px)、4K (4096px)
                       default: "1K"
                       enum:
                         - "1K"
@@ -262,19 +239,7 @@ paths:
       tags:
         - Task Query
       summary: Query Task Status
-      description: |
-        根据 `task_id` 查询异步任务的执行状态和结果。
-
-        ### 任务状态流转
-
-        ```
-        pending → processing → completed
-                             → failed
-        ```
-
-        - 建议轮询间隔：2-5 秒
-        - 当 `status` 为 `completed` 或 `failed` 时停止轮询
-        - 图片链接有效期 24 小时，请及时下载
+      description: 根据 task_id 查询异步任务的执行状态和结果。任务状态流转为 pending → processing → completed/failed。建议轮询间隔 2-5 秒，当 status 为 completed 或 failed 时停止轮询。图片链接有效期 24 小时，请及时下载。
       operationId: queryTask
       security:
         - BearerAuth: []
@@ -370,10 +335,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: |
-        使用 Bearer Token 进行认证。
-
-        获取 API Key：[ViralAPI 控制台](https://viralapi.ai/api-key)
+      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
 
   schemas:
     CreateTaskResponse:
@@ -448,12 +410,7 @@ components:
           example: "gemini-3-pro-image-preview"
         status:
           type: string
-          description: |
-            任务状态：
-            - `pending` — 排队等待
-            - `processing` — 生成中
-            - `completed` — 已完成
-            - `failed` — 失败
+          description: "任务状态：pending (排队等待)、processing (生成中)、completed (已完成)、failed (失败)"
           enum:
             - pending
             - processing
