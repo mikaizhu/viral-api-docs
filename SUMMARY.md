@@ -23,3 +23,7 @@
 * [NanoBanana Image Edit](api-reference/nanobanana-image-edit.md)
 * [NanoBanana Pro Text to Image](api-reference/nanobanana-pro-text-to-image.md)
 * [NanoBanana Pro Image Edit](api-reference/nanobanana-pro-image-edit.md)
+
+## Video Models
+
+* [Veo Video Generation](api-reference/veo-video-generation.md)

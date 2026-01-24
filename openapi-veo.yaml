@@ -1,0 +1,367 @@
+openapi: 3.0.3
+info:
+  title: Veo Video Generation API
+  description: Gemini Veo 视频生成 API，支持文生视频、图生视频、帧插值和参考图片等功能。Veo 3.0+ 支持音频输出，Veo 3.1 支持帧插值和参考图片功能。
+  version: 1.0.0
+  contact:
+    name: ViralAPI Support
+    url: https://viralapi.ai/api-key
+
+servers:
+  - url: https://viralapi.ai
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Veo
+    description: Veo 视频生成 API，支持多种视频生成模式
+
+paths:
+  /v1/videos:
+    post:
+      tags:
+        - Veo
+      summary: Create Video Generation Task
+      description: 创建视频生成任务，支持文生视频、图生视频、帧插值等模式。返回 task_id 用于查询任务状态。
+      operationId: createVideoTask
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - prompt
+              properties:
+                model:
+                  type: string
+                  description: 模型名称。Veo 2.0 支持基础功能；Veo 3.0+ 支持音频输出；Veo 3.1 额外支持帧插值和参考图片
+                  enum:
+                    - veo-2.0-generate-001
+                    - veo-3.0-generate-001
+                    - veo-3.0-fast-generate-001
+                    - veo-3.1-generate-preview
+                    - veo-3.1-fast-generate-preview
+                prompt:
+                  type: string
+                  description: 视频生成的文本描述（最多 1024 个词元）
+                  maxLength: 4096
+                images:
+                  type: array
+                  description: 图片数组。1 张图片用于图生视频（作为首帧）；2 张图片用于帧插值（首尾帧，仅 Veo 3.1 支持）
+                  items:
+                    type: string
+                    description: 图片数据，支持 HTTP(S) URL、Base64 字符串或 Data URI
+                  minItems: 1
+                  maxItems: 2
+                metadata:
+                  type: object
+                  description: 高级配置参数
+                  properties:
+                    aspectRatio:
+                      type: string
+                      description: 视频宽高比
+                      enum:
+                        - "16:9"
+                        - "9:16"
+                    durationSeconds:
+                      type: integer
+                      description: 视频时长（秒）。帧插值模式下必须为 8
+                      enum:
+                        - 4
+                        - 6
+                        - 8
+                    negativePrompt:
+                      type: string
+                      description: 负面提示词，描述不想要的元素
+                    personGeneration:
+                      type: string
+                      description: 人物生成策略。仅支持 allow_adult，不支持 allow_all
+                      enum:
+                        - allow_adult
+                    resolution:
+                      type: string
+                      description: 视频分辨率（具体值参考 Gemini 官方文档）
+                    referenceImages:
+                      type: array
+                      description: 参考图片数组（仅 Veo 3.1 支持，最多 3 张）。用于引导视频风格，不会直接出现在视频中。注意：不能与帧插值（2张images）同时使用
+                      maxItems: 3
+                      items:
+                        type: object
+                        properties:
+                          image:
+                            type: object
+                            properties:
+                              bytesBase64Encoded:
+                                type: string
+                                description: 图片数据，支持 Base64 字符串、HTTP(S) URL 或 Data URI
+                              mimeType:
+                                type: string
+                                description: 图片 MIME 类型（可选）
+                                enum:
+                                  - image/jpeg
+                                  - image/png
+                                  - image/gif
+                                  - image/webp
+                          referenceType:
+                            type: string
+                            description: 参考类型，仅支持 asset
+                            enum:
+                              - asset
+            example:
+              model: veo-3.0-generate-001
+              prompt: "一只可爱的橘猫在阳光明媚的花园里追逐蝴蝶，慢动作镜头，电影级画质"
+              metadata:
+                aspectRatio: "16:9"
+                durationSeconds: 6
+      responses:
+        "200":
+          description: 任务创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoTaskResponse'
+              example:
+                id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
+                task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
+                object: "video.generation"
+                created_at: 1704672000
+                model: "veo-3.0-generate-001"
+                status: "queued"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "402":
+          $ref: '#/components/responses/PaymentRequired'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/ServerError'
+        "502":
+          $ref: '#/components/responses/BadGateway'
+
+  /v1/videos/{task_id}:
+    get:
+      tags:
+        - Veo
+      summary: Query Video Task Status
+      description: 查询视频生成任务的状态和结果。任务完成后返回视频下载 URL。
+      operationId: queryVideoTask
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: 任务 ID（从创建任务接口返回）
+          schema:
+            type: string
+          example: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
+      responses:
+        "200":
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoQueryResponse'
+              examples:
+                in_progress:
+                  summary: 处理中
+                  value:
+                    task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
+                    status: "in_progress"
+                    progress: "50%"
+                success:
+                  summary: 生成成功
+                  value:
+                    task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
+                    status: "success"
+                    progress: "100%"
+                    url: "https://viralapi.ai/v1/videos/dmlkZW9fdGFzay0xMjM0NTY3ODkw/content"
+                failure:
+                  summary: 生成失败
+                  value:
+                    task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
+                    status: "failure"
+                    progress: "100%"
+                    fail_reason: "Content filtered by safety system: SENSITIVE_CONTENT"
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+
+  schemas:
+    VideoTaskResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 任务 ID
+        task_id:
+          type: string
+          description: 任务 ID（与 id 相同）
+        object:
+          type: string
+          description: 对象类型
+          enum:
+            - video.generation
+        created_at:
+          type: integer
+          description: 创建时间戳（Unix 秒）
+        model:
+          type: string
+          description: 使用的模型名称
+        status:
+          type: string
+          description: 任务状态
+          enum:
+            - queued
+            - in_progress
+            - success
+            - failure
+
+    VideoQueryResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+          description: 任务 ID
+        status:
+          type: string
+          description: "任务状态：queued (排队中)、in_progress (处理中)、success (成功)、failure (失败)"
+          enum:
+            - queued
+            - in_progress
+            - success
+            - failure
+        progress:
+          type: string
+          description: 进度百分比
+        url:
+          type: string
+          description: 视频下载 URL（status 为 success 时返回）
+          format: uri
+        fail_reason:
+          type: string
+          description: 失败原因（status 为 failure 时返回）
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - error
+      properties:
+        code:
+          type: integer
+          description: HTTP 状态码
+        error:
+          type: object
+          required:
+            - message
+            - type
+          properties:
+            message:
+              type: string
+              description: 错误描述
+            type:
+              type: string
+              description: 错误类型标识
+            param:
+              type: string
+              description: 导致错误的参数名称（可选）
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 400
+            error:
+              message: "Invalid request parameters"
+              type: invalid_request_error
+    Unauthorized:
+      description: 认证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 401
+            error:
+              message: "Invalid or expired token"
+              type: authentication_error
+    PaymentRequired:
+      description: 余额不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 402
+            error:
+              message: "Insufficient account balance"
+              type: payment_required
+    Forbidden:
+      description: 权限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 403
+            error:
+              message: "Access denied for this model"
+              type: permission_error
+    NotFound:
+      description: 任务不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 404
+            error:
+              message: "Task not found or expired"
+              type: not_found_error
+              param: task_id
+    ServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 500
+            error:
+              message: "Internal server error"
+              type: server_error
+    BadGateway:
+      description: 网关错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 502
+            error:
+              message: "Gateway error, server temporarily unavailable"
+              type: bad_gateway
