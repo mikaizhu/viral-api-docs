@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: Gemini Native API
+  description: Gemini 原生 API 接口，支持文本生成、多轮对话、图片理解、PDF 分析等多模态能力。支持流式和非流式两种输出模式。
+  version: 1.0.0
+  contact:
+    name: ViralAPI Support
+    url: https://viralapi.ai/api-key
+
+servers:
+  - url: https://xingjiabiapi.org
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Gemini
+    description: Gemini 原生 API，支持多模态内容生成
+
+paths:
+  /v1beta/models/{model}:generateContent:
+    post:
+      tags:
+        - Gemini
+      summary: Generate Content
+      description: 非流式内容生成，一次性返回完整响应。支持文本对话、图片理解、PDF 分析等多模态输入。
+      operationId: generateContent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: 模型名称
+          schema:
+            type: string
+            enum:
+              - gemini-3-pro-preview-thinking
+              - gemini-3-pro-preview
+              - gemini-3-flash-preview
+          example: gemini-3-flash-preview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contents
+              properties:
+                contents:
+                  type: array
+                  description: 对话内容数组，支持多轮对话
+                  items:
+                    type: object
+                    required:
+                      - role
+                      - parts
+                    properties:
+                      role:
+                        type: string
+                        description: 角色标识，user 表示用户，model 表示模型回复
+                        enum:
+                          - user
+                          - model
+                      parts:
+                        type: array
+                        description: 内容片段数组，可包含文本、图片、PDF 等
+                        items:
+                          type: object
+                          properties:
+                            text:
+                              type: string
+                              description: 文本内容
+                            inline_data:
+                              type: object
+                              description: 内嵌二进制数据（图片、PDF 等）
+                              properties:
+                                mime_type:
+                                  type: string
+                                  description: MIME 类型，支持 image/jpeg、image/png、image/gif、image/webp、application/pdf
+                                  enum:
+                                    - image/jpeg
+                                    - image/png
+                                    - image/gif
+                                    - image/webp
+                                    - application/pdf
+                                data:
+                                  type: string
+                                  description: Base64 编码的文件数据
+                generationConfig:
+                  type: object
+                  description: 生成参数配置
+                  properties:
+                    maxOutputTokens:
+                      type: integer
+                      description: 最大输出 token 数
+                      default: 8192
+                      example: 16384
+                    temperature:
+                      type: number
+                      description: 温度值 (0-2)，越高输出越随机
+                      minimum: 0
+                      maximum: 2
+                      default: 0.7
+                      example: 0.7
+                    topP:
+                      type: number
+                      description: Nucleus sampling 参数
+                      minimum: 0
+                      maximum: 1
+                      example: 0.95
+                    topK:
+                      type: integer
+                      description: Top-k sampling 参数
+                      minimum: 1
+                      example: 40
+            example:
+              contents:
+                - role: user
+                  parts:
+                    - text: "你好，介绍一下你自己"
+              generationConfig:
+                maxOutputTokens: 16384
+                temperature: 0.7
+      responses:
+        "200":
+          description: 生成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateContentResponse'
+              example:
+                candidates:
+                  - content:
+                      parts:
+                        - text: "你好！我是 Gemini，一个由 Google 开发的多模态 AI 助手。我可以帮助你完成各种任务，包括回答问题、分析图片、理解文档等。有什么我可以帮助你的吗？"
+                      role: model
+                    finishReason: STOP
+                    index: 0
+                usageMetadata:
+                  promptTokenCount: 10
+                  candidatesTokenCount: 85
+                  totalTokenCount: 95
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /v1beta/models/{model}:streamGenerateContent:
+    post:
+      tags:
+        - Gemini
+      summary: Stream Generate Content
+      description: 流式内容生成，通过 SSE (Server-Sent Events) 逐步返回响应。适合长文本生成场景，用户可实时看到生成过程。请求时需添加 ?alt=sse 查询参数。
+      operationId: streamGenerateContent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: 模型名称
+          schema:
+            type: string
+            enum:
+              - gemini-3-pro-preview-thinking
+              - gemini-3-pro-preview
+              - gemini-3-flash-preview
+          example: gemini-3-flash-preview
+        - name: alt
+          in: query
+          required: true
+          description: 输出格式，必须设置为 sse 以启用流式输出
+          schema:
+            type: string
+            enum:
+              - sse
+          example: sse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contents
+              properties:
+                contents:
+                  type: array
+                  description: 对话内容数组，支持多轮对话
+                  items:
+                    type: object
+                    required:
+                      - role
+                      - parts
+                    properties:
+                      role:
+                        type: string
+                        description: 角色标识，user 表示用户，model 表示模型回复
+                        enum:
+                          - user
+                          - model
+                      parts:
+                        type: array
+                        description: 内容片段数组，可包含文本、图片、PDF 等
+                        items:
+                          type: object
+                          properties:
+                            text:
+                              type: string
+                              description: 文本内容
+                            inline_data:
+                              type: object
+                              description: 内嵌二进制数据（图片、PDF 等）
+                              properties:
+                                mime_type:
+                                  type: string
+                                  description: MIME 类型
+                                  enum:
+                                    - image/jpeg
+                                    - image/png
+                                    - image/gif
+                                    - image/webp
+                                    - application/pdf
+                                data:
+                                  type: string
+                                  description: Base64 编码的文件数据
+                generationConfig:
+                  type: object
+                  description: 生成参数配置
+                  properties:
+                    maxOutputTokens:
+                      type: integer
+                      description: 最大输出 token 数
+                      default: 8192
+                      example: 16384
+                    temperature:
+                      type: number
+                      description: 温度值 (0-2)，越高输出越随机
+                      minimum: 0
+                      maximum: 2
+                      default: 0.7
+                      example: 0.7
+                    topP:
+                      type: number
+                      description: Nucleus sampling 参数
+                      minimum: 0
+                      maximum: 1
+                      example: 0.95
+                    topK:
+                      type: integer
+                      description: Top-k sampling 参数
+                      minimum: 1
+                      example: 40
+            example:
+              contents:
+                - role: user
+                  parts:
+                    - text: "写一篇关于AI的文章"
+              generationConfig:
+                maxOutputTokens: 16384
+                temperature: 0.7
+      responses:
+        "200":
+          description: 流式生成成功，返回 SSE 事件流
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: SSE 格式的事件流，每个事件包含部分生成内容
+              example: |
+                data: {"candidates":[{"content":{"parts":[{"text":"人工智能"}],"role":"model"},"index":0}]}
+
+                data: {"candidates":[{"content":{"parts":[{"text":"（AI）正在"}],"role":"model"},"index":0}]}
+
+                data: {"candidates":[{"content":{"parts":[{"text":"改变世界..."}],"role":"model"},"finishReason":"STOP","index":0}],"usageMetadata":{"promptTokenCount":12,"candidatesTokenCount":500,"totalTokenCount":512}}
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+
+  schemas:
+    GenerateContentResponse:
+      type: object
+      properties:
+        candidates:
+          type: array
+          description: 候选响应数组
+          items:
+            type: object
+            properties:
+              content:
+                type: object
+                properties:
+                  parts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                          description: 生成的文本内容
+                  role:
+                    type: string
+                    description: 角色标识，固定为 model
+                    enum:
+                      - model
+              finishReason:
+                type: string
+                description: 结束原因
+                enum:
+                  - STOP
+                  - MAX_TOKENS
+                  - SAFETY
+                  - RECITATION
+                  - OTHER
+              index:
+                type: integer
+                description: 候选索引
+        usageMetadata:
+          type: object
+          description: Token 使用统计
+          properties:
+            promptTokenCount:
+              type: integer
+              description: 输入 prompt 的 token 数
+            candidatesTokenCount:
+              type: integer
+              description: 生成内容的 token 数
+            totalTokenCount:
+              type: integer
+              description: 总 token 数
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - error
+      properties:
+        code:
+          type: integer
+          description: HTTP 状态码
+        error:
+          type: object
+          required:
+            - message
+            - status
+          properties:
+            message:
+              type: string
+              description: 错误描述
+            status:
+              type: string
+              description: 错误状态
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 400
+            error:
+              message: "Invalid request parameters"
+              status: INVALID_ARGUMENT
+    Unauthorized:
+      description: 认证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 401
+            error:
+              message: "Invalid or missing API key"
+              status: UNAUTHENTICATED
+    Forbidden:
+      description: 权限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 403
+            error:
+              message: "Access denied for this model"
+              status: PERMISSION_DENIED
+    ServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 500
+            error:
+              message: "Internal server error"
+              status: INTERNAL
