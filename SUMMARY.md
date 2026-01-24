@@ -15,7 +15,7 @@
 ## Chat Models
 
 * [Gemini Native API](api-reference/gemini-native-api.md)
-* [Claude API](api-reference/claude-messages.md)
+* [Claude Native API](api-reference/claude-messages.md)
 
 ## Image Models
 

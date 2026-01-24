@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Claude API
+  title: Claude Native API
   description: Claude 原生 API 接口，支持文本生成、多轮对话、图片理解等多模态能力。支持流式和非流式两种输出模式。
   version: 1.0.0
   contact:
