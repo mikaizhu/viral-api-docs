@@ -8,7 +8,7 @@ info:
     url: https://viralapi.ai/api-key
 
 servers:
-  - url: https://xingjiabiapi.org
+  - url: https://viralapi.ai
     description: Production server
 
 security:
