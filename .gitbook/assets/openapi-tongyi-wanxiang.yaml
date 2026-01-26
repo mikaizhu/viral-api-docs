@@ -1,0 +1,314 @@
+openapi: 3.0.3
+info:
+  title: 通义万相视频生成 API
+  description: |
+    通义万相视频生成 API 支持文生视频（Text-to-Video）和图生视频（Image-to-Video）功能，采用异步任务处理模式。
+
+    **支持的模型**：
+    - `wan2.2-t2v`: 文生视频模型 v2.2
+    - `wan2.2-i2v`: 图生视频模型 v2.2
+    - `wan2.5-t2v`: 文生视频模型 v2.5（支持智能改写）
+    - `wan2.5-i2v`: 图生视频模型 v2.5（更高质量）
+
+    **工作流程**：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果
+  version: 1.0.0
+  contact:
+    name: ViralAPI Support
+    url: https://viralapi.ai/api-key
+
+servers:
+  - url: https://viralapi.ai
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Tongyi Wanxiang
+    description: 通义万相视频生成模型
+
+paths:
+  /v1/task/create:
+    post:
+      tags:
+        - Tongyi Wanxiang
+      summary: 创建视频生成任务
+      description: |
+        创建异步视频生成任务，返回 task_id 用于后续查询。
+
+        **模型选择**：
+        - 文生视频（T2V）：使用 `wan2.2-t2v` 或 `wan2.5-t2v`，无需 `img_url`
+        - 图生视频（I2V）：使用 `wan2.2-i2v` 或 `wan2.5-i2v`，必需 `img_url`
+      operationId: createTongyiWanxiangTask
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - task_type
+                - input
+              properties:
+                model:
+                  type: string
+                  description: |
+                    模型名称，支持以下选项：
+                    - `wan2.2-t2v`: 文生视频 v2.2
+                    - `wan2.2-i2v`: 图生视频 v2.2
+                    - `wan2.5-t2v`: 文生视频 v2.5（支持智能改写）
+                    - `wan2.5-i2v`: 图生视频 v2.5（更高质量）
+                  enum:
+                    - wan2.2-t2v
+                    - wan2.2-i2v
+                    - wan2.5-t2v
+                    - wan2.5-i2v
+                task_type:
+                  type: string
+                  description: 任务类型，必须设置为 `video`
+                  enum:
+                    - video
+                input:
+                  type: object
+                  required:
+                    - prompt
+                  description: 输入参数对象
+                  properties:
+                    prompt:
+                      type: string
+                      description: |
+                        视频生成的文本提示词，最长 1500 字符。
+                        - 文生视频：描述想要生成的视频内容
+                        - 图生视频：描述画面的运动方式
+                      minLength: 1
+                      maxLength: 1500
+                      example: "A serene mountain landscape at sunset with flowing clouds"
+                    img_url:
+                      type: string
+                      format: uri
+                      description: |
+                        **仅图生视频（I2V）模型需要**：首帧图像 URL 或 Base64 编码
+                        - 分辨率：360-2000 像素
+                        - 文件大小：≤10MB
+                        - 格式：JPG, PNG, WebP
+                      example: "https://example.com/first-frame.jpg"
+                    negative_prompt:
+                      type: string
+                      description: 反向提示词，描述不希望出现的内容，最长 500 字符
+                      maxLength: 500
+                      example: "blurry, low quality"
+                    size:
+                      type: string
+                      description: |
+                        **仅文生视频（T2V）模型使用**：视频分辨率，默认为 `1280*720`
+                      default: "1280*720"
+                      enum:
+                        - "1280*720"
+                        - "720*1280"
+                        - "1920*1080"
+                        - "1080*1920"
+                    resolution:
+                      type: string
+                      description: |
+                        **仅图生视频（I2V）模型使用**：视频分辨率，默认为 `720P`
+                      default: "720P"
+                      enum:
+                        - "480P"
+                        - "720P"
+                        - "1080P"
+                    duration:
+                      type: integer
+                      description: 视频时长（秒），范围 2-15 秒，默认为 5 秒
+                      default: 5
+                      minimum: 2
+                      maximum: 15
+                    audio_url:
+                      type: string
+                      format: uri
+                      description: |
+                        自定义音频文件 URL
+                        - 格式：wav/mp3
+                        - 时长：3-30 秒
+                        - 大小：≤15MB
+                    prompt_extend:
+                      type: boolean
+                      description: |
+                        **仅 wan2.5-t2v 支持**：是否启用智能改写，自动优化提示词效果
+                      default: false
+                    shot_type:
+                      type: string
+                      description: 镜头类型
+                      default: "single"
+                      enum:
+                        - "single"
+                        - "multi"
+                    watermark:
+                      type: boolean
+                      description: 是否添加水印
+                      default: false
+                    seed:
+                      type: integer
+                      description: 随机种子，用于生成可复现的结果
+            examples:
+              wan22_t2v:
+                summary: Wan2.2 文生视频
+                value:
+                  model: wan2.2-t2v
+                  task_type: video
+                  input:
+                    prompt: "A serene mountain landscape at sunset with flowing clouds"
+                    size: "1280*720"
+                    duration: 5
+              wan22_i2v:
+                summary: Wan2.2 图生视频
+                value:
+                  model: wan2.2-i2v
+                  task_type: video
+                  input:
+                    prompt: "Camera slowly zooms in on the mountain peak"
+                    img_url: "https://example.com/first-frame.jpg"
+                    resolution: "720P"
+                    duration: 5
+              wan25_t2v:
+                summary: Wan2.5 文生视频
+                value:
+                  model: wan2.5-t2v
+                  task_type: video
+                  input:
+                    prompt: "A futuristic city with flying cars and neon lights"
+                    size: "1280*720"
+                    duration: 5
+                    prompt_extend: true
+              wan25_i2v:
+                summary: Wan2.5 图生视频
+                value:
+                  model: wan2.5-i2v
+                  task_type: video
+                  input:
+                    prompt: "The city comes alive with movement and energy"
+                    img_url: "https://example.com/city-scene.jpg"
+                    resolution: "720P"
+                    duration: 5
+      responses:
+        "200":
+          description: 任务创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTaskResponse'
+              example:
+                code: 200
+                msg: success
+                data:
+                  task_id: "task_tongyi_wanxiang_1765178625768"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "402":
+          $ref: '#/components/responses/PaymentRequired'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        使用 Bearer Token 进行认证。
+
+        获取 API Key：访问 [ViralAPI 控制台](https://viralapi.ai/api-key)
+
+  schemas:
+    CreateTaskResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: |
+            响应状态码
+            - **200**: 成功
+            - **400**: 请求参数错误
+            - **401**: 认证失败
+            - **402**: 余额不足
+            - **500**: 服务器错误
+          enum: [200, 400, 401, 402, 500]
+        msg:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            task_id:
+              type: string
+              description: 任务 ID，用于后续查询任务状态
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              description: 错误码
+            message:
+              type: string
+              description: 错误信息
+            type:
+              type: string
+              description: 错误类型
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 400
+              message: "Invalid request parameters"
+              type: "invalid_request_error"
+
+    Unauthorized:
+      description: 认证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 401
+              message: "Invalid or expired token"
+              type: "authentication_error"
+
+    PaymentRequired:
+      description: 余额不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 402
+              message: "Insufficient account balance"
+              type: "payment_required"
+
+    ServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 500
+              message: "Internal server error"
+              type: "server_error"

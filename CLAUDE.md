@@ -19,16 +19,24 @@
 ├── getting-started.md                # 快速开始
 ├── authentication.md                 # 认证说明
 ├── async-workflow.md                 # 异步任务工作流
-├── openapi-nanobanana.yaml           # NanoBanana (gemini-2.5-flash-image) 的 OpenAPI 规范
-├── openapi-nanobanana-pro.yaml       # NanoBanana Pro (gemini-3-pro-image-preview) 的 OpenAPI 规范
-├── openapi-gemini.yaml               # Gemini Native API 的 OpenAPI 规范
+├── .gitbook/assets/                  # OpenAPI 规范文件目录
+│   ├── openapi-nanobanana.yaml       # NanoBanana (gemini-2.5-flash-image)
+│   ├── openapi-nanobanana-pro.yaml   # NanoBanana Pro (gemini-3-pro-image-preview)
+│   ├── openapi-gemini.yaml           # Gemini Native API
+│   ├── openapi-veo.yaml              # Veo 视频生成
+│   └── openapi-tongyi-wanxiang.yaml  # 通义万相视频生成
 └── api-reference/                    # API 文档页面
     ├── query-task.md
     ├── gemini-native-api.md
     ├── nanobanana-text-to-image.md
     ├── nanobanana-image-edit.md
     ├── nanobanana-pro-text-to-image.md
-    └── nanobanana-pro-image-edit.md
+    ├── nanobanana-pro-image-edit.md
+    ├── veo-video-generation.md
+    ├── wan22-text-to-video.md
+    ├── wan22-image-to-video.md
+    ├── wan25-text-to-video.md
+    └── wan25-image-to-video.md
 ```
 
 ## 关键规则
@@ -42,12 +50,21 @@
 - `input.image_urls` 的有无区分文生图与图像编辑
 - OpenAPI 中的 `/v1/task/create-image-edit` 是**文档展示用的虚拟路径**，服务端不接受此路径
 
+**通义万相视频生成 API**：
+- 实际端点：`POST /v1/task/create`（与图像模型共用）
+- 通过 `model` 参数区分：`wan2.2-t2v`、`wan2.2-i2v`、`wan2.5-t2v`、`wan2.5-i2v`
+- 通过 `task_type: "video"` 区分视频任务
+- 文生视频（T2V）：无需 `input.img_url`，使用 `input.size` 参数
+- 图生视频（I2V）：必需 `input.img_url`，使用 `input.resolution` 参数
+
 ### OpenAPI 文件约定
 
 - 每个模型一个独立 YAML 文件，避免路径冲突
 - `openapi-nanobanana.yaml` 包含：`POST /v1/task/create`、`POST /v1/task/create-image-edit`
 - `openapi-nanobanana-pro.yaml` 包含：`POST /v1/task/create`、`POST /v1/task/create-image-edit`、`GET /v1/task/query`
 - `openapi-gemini.yaml` 包含：`POST /v1beta/models/{model}:generateContent`、`POST /v1beta/models/{model}:streamGenerateContent`（Gemini 原生 API）
+- `openapi-veo.yaml` 包含：`POST /v1/videos`、`GET /v1/videos/{task_id}`（Veo 视频生成）
+- `openapi-tongyi-wanxiang.yaml` 包含：`POST /v1/task/create`（通义万相视频生成，通过 `model` 参数区分 wan2.2-t2v/i2v、wan2.5-t2v/i2v）
 - 错误响应使用 `$ref: '#/components/responses/...'` 引用，保持 DRY
 - 请求体必须有 `example`（单数）以生成 curl 示例
 

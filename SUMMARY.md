@@ -27,3 +27,7 @@
 ## Video Models
 
 * [Veo Video Generation](api-reference/veo-video-generation.md)
+* [Wan2.2 Text to Video](api-reference/wan22-text-to-video.md)
+* [Wan2.2 Image to Video](api-reference/wan22-image-to-video.md)
+* [Wan2.5 Text to Video](api-reference/wan25-text-to-video.md)
+* [Wan2.5 Image to Video](api-reference/wan25-image-to-video.md)
