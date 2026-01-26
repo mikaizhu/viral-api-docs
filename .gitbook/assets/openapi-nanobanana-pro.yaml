@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: NanoBanana Pro API
-  description: NanoBanana Pro (gemini-3-pro-image-preview) 高质量 AI 图像生成模型，支持 1K/2K/4K 分辨率。工作流程：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果。文生图和图像编辑均使用同一端点，通过 input.image_urls 参数区分模式。
+  description: "NanoBanana Pro (gemini-3-pro-image-preview) high-quality AI image generation model, supports 1K/2K/4K resolutions. Workflow: Create task (POST /v1/task/create) to get task_id → Poll query (GET /v1/task/query) → Get results. Text-to-image and image editing use the same endpoint, differentiated by input.image_urls parameter."
   version: 1.0.0
   contact:
     name: ViralAPI Support
@@ -16,9 +16,9 @@ security:
 
 tags:
   - name: NanoBanana Pro
-    description: "模型：`gemini-3-pro-image-preview` — 高质量生成"
+    description: "Model: `gemini-3-pro-image-preview` — High quality generation"
   - name: Task Query
-    description: 异步任务状态查询（通用）
+    description: Async task status query (general)
 
 paths:
   /v1/task/create:
@@ -26,7 +26,7 @@ paths:
       tags:
         - NanoBanana Pro
       summary: NanoBanana Pro Text to Image
-      description: 创建异步图像生成任务，返回 task_id 用于后续查询。相比 NanoBanana，Pro 模型额外支持 image_size 参数（1K/2K/4K）。
+      description: Create async image generation task. Returns task_id for subsequent queries. Compared to NanoBanana, Pro model additionally supports image_size parameter (1K/2K/4K).
       operationId: createTaskNanoBananaPro
       security:
         - BearerAuth: []
@@ -43,29 +43,29 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 模型名称，必须设置为 `gemini-3-pro-image-preview`
+                  description: Model name, must be set to `gemini-3-pro-image-preview`
                   enum:
                     - gemini-3-pro-image-preview
                 task_type:
                   type: string
-                  description: 任务类型，必须设置为 `image`
+                  description: Task type, must be set to `image`
                   enum:
                     - image
                 input:
                   type: object
                   required:
                     - prompt
-                  description: 输入参数
+                  description: Input parameters
                   properties:
                     prompt:
                       type: string
-                      description: 图像生成的提示词
+                      description: Image generation prompt
                       minLength: 1
                       maxLength: 4096
                       example: "A futuristic banana with neon lights in a cyberpunk city"
                     image_size:
                       type: string
-                      description: 输出图像分辨率，可选 1K (1024px, 默认)、2K (2048px)、4K (4096px)
+                      description: Output image resolution, options are 1K (1024px, default), 2K (2048px), 4K (4096px)
                       default: "1K"
                       enum:
                         - "1K"
@@ -73,7 +73,7 @@ paths:
                         - "4K"
                     aspect_ratio:
                       type: string
-                      description: 图像宽高比，默认为 `auto`
+                      description: Image aspect ratio, defaults to `auto`
                       default: "auto"
                       enum:
                         - "auto"
@@ -96,7 +96,7 @@ paths:
                 aspect_ratio: "9:16"
       responses:
         "200":
-          description: 任务创建成功
+          description: Task created successfully
           content:
             application/json:
               schema:
@@ -126,7 +126,7 @@ paths:
       tags:
         - NanoBanana Pro
       summary: NanoBanana Pro Image Edit
-      description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
+      description: "Create async image editing task based on reference images. Returns task_id for subsequent queries. Note: Actual API endpoint is POST /v1/task/create, switches to image editing mode by passing image_urls parameter."
       operationId: createImageEditTaskNanoBananaPro
       security:
         - BearerAuth: []
@@ -143,12 +143,12 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 模型名称，必须设置为 `gemini-3-pro-image-preview`
+                  description: Model name, must be set to `gemini-3-pro-image-preview`
                   enum:
                     - gemini-3-pro-image-preview
                 task_type:
                   type: string
-                  description: 任务类型，必须设置为 `image`
+                  description: Task type, must be set to `image`
                   enum:
                     - image
                 input:
@@ -156,17 +156,17 @@ paths:
                   required:
                     - prompt
                     - image_urls
-                  description: 输入参数
+                  description: Input parameters
                   properties:
                     prompt:
                       type: string
-                      description: 图像编辑的提示词，描述如何转换参考图像
+                      description: Image editing prompt describing how to transform the reference image
                       minLength: 1
                       maxLength: 4096
                       example: "Transform this into a cyberpunk style with neon lights"
                     image_urls:
                       type: array
-                      description: 输入图像的 URL 数组，最多支持 10 张图片
+                      description: Input image URL array, supports up to 10 images
                       items:
                         type: string
                         format: uri
@@ -176,7 +176,7 @@ paths:
                         - "https://example.com/input-image.jpg"
                     image_size:
                       type: string
-                      description: 输出图像分辨率，可选 1K (1024px, 默认)、2K (2048px)、4K (4096px)
+                      description: Output image resolution, options are 1K (1024px, default), 2K (2048px), 4K (4096px)
                       default: "1K"
                       enum:
                         - "1K"
@@ -184,7 +184,7 @@ paths:
                         - "4K"
                     aspect_ratio:
                       type: string
-                      description: 图像宽高比，默认为 `auto`
+                      description: Image aspect ratio, defaults to `auto`
                       default: "auto"
                       enum:
                         - "auto"
@@ -209,7 +209,7 @@ paths:
                 aspect_ratio: "9:16"
       responses:
         "200":
-          description: 任务创建成功
+          description: Task created successfully
           content:
             application/json:
               schema:
@@ -239,7 +239,7 @@ paths:
       tags:
         - Task Query
       summary: Query Task Status
-      description: 根据 task_id 查询异步任务的执行状态和结果。任务状态流转为 pending → processing → completed/failed。建议轮询间隔 2-5 秒，当 status 为 completed 或 failed 时停止轮询。图片链接有效期 24 小时，请及时下载。
+      description: "Query async task execution status and results by task_id. Task status flow: pending → processing → completed/failed. Recommended polling interval: 2-5 seconds. Stop polling when status is completed or failed. Image links are valid for 24 hours, download promptly."
       operationId: queryTask
       security:
         - BearerAuth: []
@@ -247,20 +247,20 @@ paths:
         - name: task_id
           in: query
           required: true
-          description: 任务 ID（从创建任务接口返回的 `data.task_id`）
+          description: Task ID (from `data.task_id` returned by create task endpoint)
           schema:
             type: string
           example: "task_nano-banana-pro_1765178625768"
       responses:
         "200":
-          description: 查询成功
+          description: Query successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaskStatusResponse'
               examples:
                 completed:
-                  summary: 任务完成
+                  summary: Task Completed
                   value:
                     create_time: 1756817821
                     complete_time: 1763088308
@@ -272,7 +272,7 @@ paths:
                     results:
                       - "https://cdn.viralapi.ai/outputs/generated-image-1.png"
                 processing:
-                  summary: 任务处理中
+                  summary: Task Processing
                   value:
                     create_time: 1756817821
                     complete_time: 0
@@ -283,7 +283,7 @@ paths:
                     status: processing
                     results: []
                 pending:
-                  summary: 任务等待中
+                  summary: Task Pending
                   value:
                     create_time: 1756817821
                     complete_time: 0
@@ -294,7 +294,7 @@ paths:
                     status: pending
                     results: []
                 failed:
-                  summary: 任务失败
+                  summary: Task Failed
                   value:
                     create_time: 1756817821
                     complete_time: 1763088308
@@ -313,7 +313,7 @@ paths:
         "403":
           $ref: '#/components/responses/Forbidden'
         "404":
-          description: 任务不存在或已过期
+          description: Task not found or expired
           content:
             application/json:
               schema:
@@ -335,7 +335,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+      description: Authenticate using Bearer Token. Get API Key at https://viralapi.ai/api-key
 
   schemas:
     CreateTaskResponse:
@@ -347,12 +347,12 @@ components:
       properties:
         code:
           type: integer
-          description: 业务状态码
+          description: Business status code
           enum: [200]
           example: 200
         msg:
           type: string
-          description: 状态消息
+          description: Status message
           example: "success"
         data:
           type: object
@@ -361,7 +361,7 @@ components:
           properties:
             task_id:
               type: string
-              description: 异步任务 ID，用于查询任务状态
+              description: Async task ID for querying task status
               example: "task_nano-banana-pro_1765178625768"
 
     TaskStatusResponse:
@@ -379,38 +379,38 @@ components:
         create_time:
           type: integer
           format: int64
-          description: 任务创建时间（Unix 时间戳，秒）
+          description: Task creation time (Unix timestamp, seconds)
           example: 1756817821
         complete_time:
           type: integer
           format: int64
-          description: 任务完成时间（Unix 时间戳，秒），未完成时为 `0`
+          description: Task completion time (Unix timestamp, seconds), `0` when not completed
           example: 1763088308
         task_type:
           type: string
-          description: 任务类型
+          description: Task type
           enum: [image]
           example: "image"
         task_id:
           type: string
-          description: 任务 ID
+          description: Task ID
           example: "task_nano-banana-pro_1765178625768"
         progress:
           type: integer
-          description: 任务进度百分比
+          description: Task progress percentage
           minimum: 0
           maximum: 100
           example: 100
         model:
           type: string
-          description: 使用的模型名称
+          description: Model name used
           enum:
             - gemini-2.5-flash-image
             - gemini-3-pro-image-preview
           example: "gemini-3-pro-image-preview"
         status:
           type: string
-          description: "任务状态：pending (排队等待)、processing (生成中)、completed (已完成)、failed (失败)"
+          description: "Task status: pending (queued), processing (generating), completed (finished), failed (failed)"
           enum:
             - pending
             - processing
@@ -419,7 +419,7 @@ components:
           example: "completed"
         results:
           type: array
-          description: 生成的图片 URL 数组。仅 `completed` 状态时包含有效 URL。链接有效期 24 小时。
+          description: Generated image URL array. Only contains valid URLs when status is `completed`. Links are valid for 24 hours.
           items:
             type: string
             format: uri
@@ -434,7 +434,7 @@ components:
       properties:
         code:
           type: integer
-          description: HTTP 状态码
+          description: HTTP status code
         error:
           type: object
           required:
@@ -443,20 +443,20 @@ components:
           properties:
             message:
               type: string
-              description: 错误描述
+              description: Error message
             type:
               type: string
-              description: 错误类型标识
+              description: Error type identifier
             param:
               type: string
-              description: 导致错误的参数名称（可选）
+              description: Parameter name that caused the error (optional)
             fallback_suggestion:
               type: string
-              description: 建议的替代方案（可选）
+              description: Suggested alternative (optional)
 
   responses:
     BadRequest:
-      description: 请求参数错误
+      description: Invalid request parameters
       content:
         application/json:
           schema:
@@ -467,7 +467,7 @@ components:
               message: "Invalid request parameters"
               type: invalid_request_error
     Unauthorized:
-      description: 认证失败
+      description: Authentication failed
       content:
         application/json:
           schema:
@@ -478,7 +478,7 @@ components:
               message: "Invalid or expired token"
               type: authentication_error
     PaymentRequired:
-      description: 余额不足
+      description: Insufficient account balance
       content:
         application/json:
           schema:
@@ -489,7 +489,7 @@ components:
               message: "Insufficient account balance"
               type: payment_required
     Forbidden:
-      description: 权限不足
+      description: Insufficient permissions
       content:
         application/json:
           schema:
@@ -501,7 +501,7 @@ components:
               type: permission_error
               param: model
     NotFound:
-      description: 资源不存在
+      description: Resource not found
       content:
         application/json:
           schema:
@@ -512,7 +512,7 @@ components:
               message: "Resource not found"
               type: not_found_error
     ServerError:
-      description: 服务器内部错误
+      description: Internal server error
       content:
         application/json:
           schema:
@@ -523,7 +523,7 @@ components:
               message: "Internal server error, please try again later"
               type: server_error
     BadGateway:
-      description: 网关错误
+      description: Gateway error
       content:
         application/json:
           schema:
