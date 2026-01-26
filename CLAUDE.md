@@ -171,3 +171,92 @@ API Reference 页面格式固定：
 - 分支：直接在 `main` 上工作（GitBook 同步 main）
 - 提交信息：简洁描述改动内容
 - 推送后 GitBook 自动同步更新
+
+## 英文翻译指导原则
+
+### 翻译策略
+
+- **分支管理**：
+  - `main` 分支：保留中文版本（本地）
+  - `english` 分支：英文版本（推送到 GitBook 线上）
+
+- **翻译范围**：
+  - 所有 Markdown 文档（`.md` 文件）
+  - 所有 OpenAPI YAML 文件中的 `description`、`summary`、`title` 等描述性字段
+  - 保持代码示例、URL、技术术语不变
+
+### 写作风格参考
+
+参考 [OpenRouter API Documentation](https://openrouter.ai/docs) 的专业风格：
+
+**核心原则**：
+1. **清晰直接**（Clear & Direct）
+   - 避免行话和复杂术语
+   - 使用对话式语言
+   - 每个概念用 1-2 句话描述
+
+2. **问题-解决方案框架**（Problem-Solution Framework）
+   - 先解释为什么需要这个功能
+   - 然后说明如何使用
+
+3. **祈使语言**（Imperative Language）
+   - 使用动词开头："Generate videos", "Create task", "Returns a list"
+   - 避免被动语态
+
+4. **功能性描述**（Functional Description）
+   - 避免营销语言
+   - 专注于功能和技术细节
+   - 保持客观和准确
+
+5. **简洁性**（Conciseness）
+   - 去除冗余词汇
+   - 直接表达核心信息
+   - 避免过度解释
+
+### 翻译示例
+
+**标题翻译**：
+- ✅ "Wan2.2 Text to Video" （简洁、描述性）
+- ❌ "Wan2.2 Text-to-Video Generation API" （过于冗长）
+
+**描述翻译**：
+- ✅ "Generate videos from text descriptions using the `wan2.2-t2v-plus` model."
+- ❌ "This API allows you to generate high-quality videos from your text descriptions by utilizing the powerful wan2.2-t2v-plus model."
+
+**参数描述**：
+- ✅ "Video duration (seconds)"
+- ❌ "The duration of the video in seconds"
+
+**注意事项**：
+- ✅ "Duration Limit: wan2.2 models generate fixed 5-second videos, cannot be modified"
+- ❌ "Please note that the duration limit for wan2.2 models is fixed at 5 seconds and this cannot be modified"
+
+### 常用术语对照表
+
+| 中文 | 英文 |
+|------|------|
+| 文生视频 | Text-to-Video (T2V) |
+| 图生视频 | Image-to-Video (I2V) |
+| 提示词 | Prompt |
+| 反向提示词 | Negative prompt |
+| 智能改写 | Prompt enhancement |
+| 时长 | Duration |
+| 分辨率 | Resolution |
+| 处理时间 | Processing time |
+| 视频有效期 | Video expiration |
+| 任务创建成功 | Task created successfully |
+| 请求参数错误 | Invalid request parameters |
+| 认证失败 | Authentication failed |
+| 余额不足 | Insufficient account balance |
+| 服务器内部错误 | Internal server error |
+
+### 翻译检查清单
+
+翻译完成后，检查以下项目：
+
+- [ ] 所有标题使用简洁的名词短语
+- [ ] 描述使用祈使语言或陈述句
+- [ ] 避免使用"please", "you can", "it is possible to"等冗余表达
+- [ ] 技术术语保持一致性
+- [ ] 代码示例和URL保持不变
+- [ ] 保持原文的段落结构和格式
