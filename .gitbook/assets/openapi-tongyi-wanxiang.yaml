@@ -5,10 +5,11 @@ info:
     通义万相视频生成 API 支持文生视频（Text-to-Video）和图生视频（Image-to-Video）功能，采用异步任务处理模式。
 
     **支持的模型**：
-    - `wan2.2-t2v`: 文生视频模型 v2.2
-    - `wan2.2-i2v`: 图生视频模型 v2.2
-    - `wan2.5-t2v`: 文生视频模型 v2.5（支持智能改写）
-    - `wan2.5-i2v`: 图生视频模型 v2.5（更高质量）
+    - `wan2.2-t2v-plus`: 文生视频模型 v2.2（固定5秒，无音频）
+    - `wan2.2-i2v-flash`: 图生视频模型 v2.2 Flash（480P/720P，固定5秒）
+    - `wan2.2-i2v-plus`: 图生视频模型 v2.2 Plus（480P/1080P，固定5秒）
+    - `wan2.5-t2v-preview`: 文生视频模型 v2.5（支持智能改写，5/10秒，有声）
+    - `wan2.5-i2v-preview`: 图生视频模型 v2.5（更高质量，5/10秒，有声）
 
     **工作流程**：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果
   version: 1.0.0
@@ -37,8 +38,8 @@ paths:
         创建异步视频生成任务，返回 task_id 用于后续查询。
 
         **模型选择**：
-        - 文生视频（T2V）：使用 `wan2.2-t2v` 或 `wan2.5-t2v`，无需 `img_url`
-        - 图生视频（I2V）：使用 `wan2.2-i2v` 或 `wan2.5-i2v`，必需 `img_url`
+        - 文生视频（T2V）：使用 `wan2.2-t2v-plus` 或 `wan2.5-t2v-preview`，无需 `img_url`
+        - 图生视频（I2V）：使用 `wan2.2-i2v-flash`、`wan2.2-i2v-plus` 或 `wan2.5-i2v-preview`，必需 `img_url`
       operationId: createTongyiWanxiangTask
       security:
         - BearerAuth: []
@@ -57,15 +58,17 @@ paths:
                   type: string
                   description: |
                     模型名称，支持以下选项：
-                    - `wan2.2-t2v`: 文生视频 v2.2
-                    - `wan2.2-i2v`: 图生视频 v2.2
-                    - `wan2.5-t2v`: 文生视频 v2.5（支持智能改写）
-                    - `wan2.5-i2v`: 图生视频 v2.5（更高质量）
+                    - `wan2.2-t2v-plus`: 文生视频 v2.2（固定5秒，无音频）
+                    - `wan2.2-i2v-flash`: 图生视频 v2.2 Flash（480P/720P，固定5秒）
+                    - `wan2.2-i2v-plus`: 图生视频 v2.2 Plus（480P/1080P，固定5秒）
+                    - `wan2.5-t2v-preview`: 文生视频 v2.5（支持智能改写，5/10秒，有声）
+                    - `wan2.5-i2v-preview`: 图生视频 v2.5（更高质量，5/10秒，有声）
                   enum:
-                    - wan2.2-t2v
-                    - wan2.2-i2v
-                    - wan2.5-t2v
-                    - wan2.5-i2v
+                    - wan2.2-t2v-plus
+                    - wan2.2-i2v-flash
+                    - wan2.2-i2v-plus
+                    - wan2.5-t2v-preview
+                    - wan2.5-i2v-preview
                 task_type:
                   type: string
                   description: 任务类型，必须设置为 `video`
@@ -80,7 +83,9 @@ paths:
                     prompt:
                       type: string
                       description: |
-                        视频生成的文本提示词，最长 1500 字符。
+                        视频生成的文本提示词。
+                        - wan2.2 模型：最长 800 字符
+                        - wan2.5 模型：最长 1500 字符
                         - 文生视频：描述想要生成的视频内容
                         - 图生视频：描述画面的运动方式
                       minLength: 1
@@ -113,7 +118,10 @@ paths:
                     resolution:
                       type: string
                       description: |
-                        **仅图生视频（I2V）模型使用**：视频分辨率，默认为 `720P`
+                        **仅图生视频（I2V）模型使用**：视频分辨率
+                        - wan2.2-i2v-flash：可选 480P、720P，默认 720P
+                        - wan2.2-i2v-plus：可选 480P、1080P，默认 1080P
+                        - wan2.5-i2v-preview：可选 480P、720P、1080P，默认 1080P
                       default: "720P"
                       enum:
                         - "480P"
@@ -121,7 +129,10 @@ paths:
                         - "1080P"
                     duration:
                       type: integer
-                      description: 视频时长（秒），范围 2-15 秒，默认为 5 秒
+                      description: |
+                        视频时长（秒）
+                        - wan2.2 模型：固定 5 秒，不可修改
+                        - wan2.5 模型：可选 5、10 秒，默认 5 秒
                       default: 5
                       minimum: 2
                       maximum: 15
@@ -129,14 +140,16 @@ paths:
                       type: string
                       format: uri
                       description: |
-                        自定义音频文件 URL
+                        自定义音频文件 URL（仅 wan2.5 模型支持，wan2.2 模型不支持音频）
+                        - wan2.5 模型默认生成有声视频（自动配音）
+                        - 可选：传入自定义音频文件
                         - 格式：wav/mp3
                         - 时长：3-30 秒
                         - 大小：≤15MB
                     prompt_extend:
                       type: boolean
                       description: |
-                        **仅 wan2.5-t2v 支持**：是否启用智能改写，自动优化提示词效果
+                        **仅 wan2.5-t2v-preview 支持**：是否启用智能改写，自动优化提示词效果
                       default: false
                     shot_type:
                       type: string
@@ -156,16 +169,16 @@ paths:
               wan22_t2v:
                 summary: Wan2.2 文生视频
                 value:
-                  model: wan2.2-t2v
+                  model: wan2.2-t2v-plus
                   task_type: video
                   input:
                     prompt: "A serene mountain landscape at sunset with flowing clouds"
                     size: "1280*720"
                     duration: 5
               wan22_i2v:
-                summary: Wan2.2 图生视频
+                summary: Wan2.2 图生视频 Flash
                 value:
-                  model: wan2.2-i2v
+                  model: wan2.2-i2v-flash
                   task_type: video
                   input:
                     prompt: "Camera slowly zooms in on the mountain peak"
@@ -175,7 +188,7 @@ paths:
               wan25_t2v:
                 summary: Wan2.5 文生视频
                 value:
-                  model: wan2.5-t2v
+                  model: wan2.5-t2v-preview
                   task_type: video
                   input:
                     prompt: "A futuristic city with flying cars and neon lights"
@@ -185,12 +198,12 @@ paths:
               wan25_i2v:
                 summary: Wan2.5 图生视频
                 value:
-                  model: wan2.5-i2v
+                  model: wan2.5-i2v-preview
                   task_type: video
                   input:
                     prompt: "The city comes alive with movement and energy"
                     img_url: "https://example.com/city-scene.jpg"
-                    resolution: "720P"
+                    resolution: "1080P"
                     duration: 5
       responses:
         "200":

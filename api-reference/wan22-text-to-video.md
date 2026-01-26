@@ -1,13 +1,14 @@
 # Wan2.2 Text to Video
 
-使用 `wan2.2-t2v` 模型将文本描述转换为视频。
+使用 `wan2.2-t2v-plus` 模型将文本描述转换为视频。
 
 ## 模型特性
 
 - **文本驱动**: 仅需文本描述即可生成视频
-- **灵活分辨率**: 支持 720P/1080P，横屏/竖屏
-- **时长可控**: 支持 2-15 秒的视频生成
-- **镜头控制**: 支持单镜头和多镜头叙事
+- **固定时长**: 视频时长固定为 5 秒，不可修改
+- **默认分辨率**: 1920*1080（1080P），支持 480P/1080P 分辨率
+- **提示词限制**: 最长 800 字符
+- **无音频支持**: wan2.2 模型不支持添加音频
 
 ## API 端点
 
@@ -20,7 +21,7 @@
 
 ```json
 {
-  "model": "wan2.2-t2v",
+  "model": "wan2.2-t2v-plus",
   "task_type": "video",
   "input": {
     "prompt": "A serene mountain landscape at sunset with flowing clouds",
@@ -34,19 +35,21 @@
 
 ```json
 {
-  "model": "wan2.2-t2v",
+  "model": "wan2.2-t2v-plus",
   "task_type": "video",
   "input": {
     "prompt": "A futuristic city with flying cars",
     "negative_prompt": "blurry, low quality",
     "size": "1920*1080",
-    "duration": 8
+    "duration": 5
   }
 }
 ```
 
 ## 重要说明
 
+> **时长限制**: wan2.2-t2v-plus 固定生成 5 秒视频，不可修改
+> **提示词长度**: 最长 800 字符
+> **音频支持**: wan2.2 模型不支持添加音频
 > **处理时间**: 通常 1-5 分钟
 > **视频有效期**: 24 小时，请及时下载
-> **计费方式**: 按成功生成的视频秒数计费

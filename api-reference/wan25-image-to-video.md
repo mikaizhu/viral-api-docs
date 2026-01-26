@@ -1,13 +1,14 @@
 # Wan2.5 Image to Video
 
-使用 `wan2.5-i2v` 模型将图像转换为高质量动态视频。
+使用 `wan2.5-i2v-preview` 模型将图像转换为高质量动态视频。
 
 ## 模型特性
 
 - **增强的运动理解**: 更准确地理解和执行运动指令
 - **自然的动作**: 更流畅、更符合物理规律的画面运动
-- **高质量输出**: 支持最高 1080P 分辨率
-- **灵活时长**: 支持 2-15 秒的视频生成
+- **高质量输出**: 支持最高 1080P 分辨率，默认 1080P
+- **时长可选**: 支持 5、10 秒的视频生成，默认 5 秒
+- **有声视频**: 默认生成有声视频（自动配音），支持自定义音频
 - **镜头控制**: 支持单镜头和多镜头叙事
 
 ## 版本优势
@@ -29,12 +30,12 @@
 
 ```json
 {
-  "model": "wan2.5-i2v",
+  "model": "wan2.5-i2v-preview",
   "task_type": "video",
   "input": {
     "prompt": "The city comes alive with movement and energy",
     "img_url": "https://example.com/city-scene.jpg",
-    "resolution": "720P",
+    "resolution": "1080P",
     "duration": 5
   }
 }
@@ -44,13 +45,13 @@
 
 ```json
 {
-  "model": "wan2.5-i2v",
+  "model": "wan2.5-i2v-preview",
   "task_type": "video",
   "input": {
     "prompt": "Camera slowly pans right while the character turns and smiles",
     "img_url": "https://example.com/portrait.jpg",
     "resolution": "1080P",
-    "duration": 8,
+    "duration": 10,
     "shot_type": "multi"
   }
 }
@@ -65,6 +66,8 @@
 
 ## 重要说明
 
+> **时长选项**: 可选 5 秒或 10 秒，默认 5 秒
+> **有声视频**: 默认生成有声视频（自动配音），可通过 `audio_url` 自定义音频
 > **提示词建议**: 具体描述运动方式和节奏，如"镜头缓慢向右平移，人物逐渐转身"
 > **处理时间**: 通常 1-5 分钟
 > **视频有效期**: 24 小时，请及时下载
