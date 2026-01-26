@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: NanoBanana API
-  description: NanoBanana (gemini-2.5-flash-image) 快速高效的 AI 图像生成模型。工作流程：创建任务 (POST /v1/task/create) 获取 task_id → 轮询查询 (GET /v1/task/query) → 获取结果。文生图和图像编辑均使用同一端点，通过 input.image_urls 参数区分模式。
+  description: "NanoBanana (gemini-2.5-flash-image) fast and efficient AI image generation model. Workflow: Create task (POST /v1/task/create) to get task_id → Poll query (GET /v1/task/query) → Get results. Text-to-image and image editing use the same endpoint, differentiated by input.image_urls parameter."
   version: 1.0.0
   contact:
     name: ViralAPI Support
@@ -16,7 +16,7 @@ security:
 
 tags:
   - name: NanoBanana
-    description: "模型：`gemini-2.5-flash-image` — 快速生成"
+    description: "Model: `gemini-2.5-flash-image` — Fast generation"
 
 paths:
   /v1/task/create:
@@ -24,7 +24,7 @@ paths:
       tags:
         - NanoBanana
       summary: NanoBanana Text to Image
-      description: 创建异步图像生成任务，返回 task_id 用于后续查询。
+      description: Create async image generation task. Returns task_id for subsequent queries.
       operationId: createTaskNanoBanana
       security:
         - BearerAuth: []
@@ -41,29 +41,29 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 模型名称，必须设置为 `gemini-2.5-flash-image`
+                  description: Model name, must be set to `gemini-2.5-flash-image`
                   enum:
                     - gemini-2.5-flash-image
                 task_type:
                   type: string
-                  description: 任务类型，必须设置为 `image`
+                  description: Task type, must be set to `image`
                   enum:
                     - image
                 input:
                   type: object
                   required:
                     - prompt
-                  description: 输入参数
+                  description: Input parameters
                   properties:
                     prompt:
                       type: string
-                      description: 图像生成的提示词
+                      description: Image generation prompt
                       minLength: 1
                       maxLength: 4096
                       example: "A serene mountain landscape at sunset with vibrant colors"
                     aspect_ratio:
                       type: string
-                      description: 图像宽高比，默认为 `auto`
+                      description: Image aspect ratio, defaults to `auto`
                       default: "auto"
                       enum:
                         - "auto"
@@ -85,7 +85,7 @@ paths:
                 aspect_ratio: "16:9"
       responses:
         "200":
-          description: 任务创建成功
+          description: Task created successfully
           content:
             application/json:
               schema:
@@ -115,7 +115,7 @@ paths:
       tags:
         - NanoBanana
       summary: NanoBanana Image Edit
-      description: 基于参考图像创建异步图像编辑任务，返回 task_id 用于后续查询。注意：实际 API 端点为 POST /v1/task/create，通过传入 image_urls 参数切换为图像编辑模式。
+      description: "Create async image editing task based on reference images. Returns task_id for subsequent queries. Note: Actual API endpoint is POST /v1/task/create, switches to image editing mode by passing image_urls parameter."
       operationId: createImageEditTaskNanoBanana
       security:
         - BearerAuth: []
@@ -132,12 +132,12 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 模型名称，必须设置为 `gemini-2.5-flash-image`
+                  description: Model name, must be set to `gemini-2.5-flash-image`
                   enum:
                     - gemini-2.5-flash-image
                 task_type:
                   type: string
-                  description: 任务类型，必须设置为 `image`
+                  description: Task type, must be set to `image`
                   enum:
                     - image
                 input:
@@ -145,17 +145,17 @@ paths:
                   required:
                     - prompt
                     - image_urls
-                  description: 输入参数
+                  description: Input parameters
                   properties:
                     prompt:
                       type: string
-                      description: 图像编辑的提示词，描述如何转换参考图像
+                      description: Image editing prompt describing how to transform the reference image
                       minLength: 1
                       maxLength: 4096
                       example: "Transform this into a watercolor painting style"
                     image_urls:
                       type: array
-                      description: 输入图像的 URL 数组，最多支持 10 张图片
+                      description: Input image URL array, supports up to 10 images
                       items:
                         type: string
                         format: uri
@@ -165,7 +165,7 @@ paths:
                         - "https://example.com/input-image.jpg"
                     aspect_ratio:
                       type: string
-                      description: 图像宽高比，默认为 `auto`
+                      description: Image aspect ratio, defaults to `auto`
                       default: "auto"
                       enum:
                         - "auto"
@@ -189,7 +189,7 @@ paths:
                 aspect_ratio: "1:1"
       responses:
         "200":
-          description: 任务创建成功
+          description: Task created successfully
           content:
             application/json:
               schema:
@@ -220,7 +220,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+      description: Authenticate using Bearer Token. Get API Key at https://viralapi.ai/api-key
 
   schemas:
     CreateTaskResponse:
@@ -232,12 +232,12 @@ components:
       properties:
         code:
           type: integer
-          description: 业务状态码
+          description: Business status code
           enum: [200]
           example: 200
         msg:
           type: string
-          description: 状态消息
+          description: Status message
           example: "success"
         data:
           type: object
@@ -246,7 +246,7 @@ components:
           properties:
             task_id:
               type: string
-              description: 异步任务 ID，用于查询任务状态
+              description: Async task ID for querying task status
               example: "task_nanobanana_1765178625768"
 
     ErrorResponse:
@@ -257,7 +257,7 @@ components:
       properties:
         code:
           type: integer
-          description: HTTP 状态码
+          description: HTTP status code
         error:
           type: object
           required:
@@ -266,20 +266,20 @@ components:
           properties:
             message:
               type: string
-              description: 错误描述
+              description: Error message
             type:
               type: string
-              description: 错误类型标识
+              description: Error type identifier
             param:
               type: string
-              description: 导致错误的参数名称（可选）
+              description: Parameter name that caused the error (optional)
             fallback_suggestion:
               type: string
-              description: 建议的替代方案（可选）
+              description: Suggested alternative (optional)
 
   responses:
     BadRequest:
-      description: 请求参数错误
+      description: Invalid request parameters
       content:
         application/json:
           schema:
@@ -290,7 +290,7 @@ components:
               message: "Invalid request parameters"
               type: invalid_request_error
     Unauthorized:
-      description: 认证失败 — Token 缺失或无效
+      description: Authentication failed — Token missing or invalid
       content:
         application/json:
           schema:
@@ -301,7 +301,7 @@ components:
               message: "Invalid or expired token"
               type: authentication_error
     PaymentRequired:
-      description: 余额不足
+      description: Insufficient account balance
       content:
         application/json:
           schema:
@@ -312,7 +312,7 @@ components:
               message: "Insufficient account balance"
               type: payment_required
     Forbidden:
-      description: 权限不足
+      description: Insufficient permissions
       content:
         application/json:
           schema:
@@ -324,7 +324,7 @@ components:
               type: permission_error
               param: model
     NotFound:
-      description: 资源不存在
+      description: Resource not found
       content:
         application/json:
           schema:
@@ -335,7 +335,7 @@ components:
               message: "Resource not found"
               type: not_found_error
     ServerError:
-      description: 服务器内部错误
+      description: Internal server error
       content:
         application/json:
           schema:
@@ -346,7 +346,7 @@ components:
               message: "Internal server error, please try again later"
               type: server_error
     BadGateway:
-      description: 网关错误
+      description: Gateway error
       content:
         application/json:
           schema:
