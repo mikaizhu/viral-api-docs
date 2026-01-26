@@ -1,15 +1,15 @@
 # Wan2.2 Text to Video
 
-使用 `wan2.2-t2v-plus` 模型将文本描述转换为视频。
+Generate videos from text descriptions using the `wan2.2-t2v-plus` model.
 
-## API 端点
+## API Endpoint
 
 {% openapi src="../.gitbook/assets/openapi-tongyi-wanxiang.yaml" path="/v1/task/create" method="post" %}
 {% endopenapi %}
 
-## 使用示例
+## Usage Examples
 
-### 基础文生视频
+### Basic Text-to-Video
 
 ```json
 {
@@ -23,7 +23,7 @@
 }
 ```
 
-### 带反向提示词
+### With Negative Prompt
 
 ```json
 {
@@ -38,10 +38,10 @@
 }
 ```
 
-## 重要说明
+## Important Notes
 
-> **时长限制**: wan2.2-t2v-plus 固定生成 5 秒视频，不可修改
-> **提示词长度**: 最长 800 字符
-> **音频支持**: wan2.2 模型不支持添加音频
-> **处理时间**: 通常 1-5 分钟
-> **视频有效期**: 24 小时，请及时下载
+> **Duration Limit**: wan2.2-t2v-plus generates fixed 5-second videos, cannot be modified
+> **Prompt Length**: Maximum 800 characters
+> **Audio Support**: wan2.2 models do not support audio
+> **Processing Time**: Typically 1-5 minutes
+> **Video Expiration**: 24 hours, download promptly

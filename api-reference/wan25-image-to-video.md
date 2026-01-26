@@ -1,15 +1,15 @@
 # Wan2.5 Image to Video
 
-使用 `wan2.5-i2v-preview` 模型将图像转换为高质量动态视频。
+Convert images to high-quality dynamic videos using the `wan2.5-i2v-preview` model.
 
-## API 端点
+## API Endpoint
 
 {% openapi src="../.gitbook/assets/openapi-tongyi-wanxiang.yaml" path="/v1/task/create" method="post" %}
 {% endopenapi %}
 
-## 使用示例
+## Usage Examples
 
-### 基础图生视频
+### Basic Image-to-Video
 
 ```json
 {
@@ -24,7 +24,7 @@
 }
 ```
 
-### 复杂运动控制
+### Advanced Motion Control
 
 ```json
 {
@@ -40,17 +40,17 @@
 }
 ```
 
-## 图像要求
+## Image Requirements
 
-- **分辨率**: 360-2000 像素
-- **文件大小**: ≤10MB
-- **格式**: JPG, PNG, WebP
-- **建议**: 使用清晰、构图良好的图像以获得最佳效果
+- **Resolution**: 360-2000 pixels
+- **File Size**: ≤10MB
+- **Format**: JPG, PNG, WebP
+- **Recommendation**: Use clear, well-composed images for best results
 
-## 重要说明
+## Important Notes
 
-> **时长选项**: 可选 5 秒或 10 秒，默认 5 秒
-> **有声视频**: 默认生成有声视频（自动配音），可通过 `audio_url` 自定义音频
-> **提示词建议**: 具体描述运动方式和节奏，如"镜头缓慢向右平移，人物逐渐转身"
-> **处理时间**: 通常 1-5 分钟
-> **视频有效期**: 24 小时，请及时下载
+> **Duration Options**: Choose 5 or 10 seconds, defaults to 5 seconds
+> **Audio Support**: Generates videos with audio by default (auto-dubbing), customize via `audio_url`
+> **Prompt Tip**: Describe motion style and rhythm specifically, e.g., "camera slowly pans right while character gradually turns"
+> **Processing Time**: Typically 1-5 minutes
+> **Video Expiration**: 24 hours, download promptly

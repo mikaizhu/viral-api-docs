@@ -1,15 +1,15 @@
 # Wan2.5 Text to Video
 
-使用 `wan2.5-t2v-preview` 模型将文本描述转换为高质量视频。
+Generate high-quality videos from text descriptions using the `wan2.5-t2v-preview` model.
 
-## API 端点
+## API Endpoint
 
 {% openapi src="../.gitbook/assets/openapi-tongyi-wanxiang.yaml" path="/v1/task/create" method="post" %}
 {% endopenapi %}
 
-## 使用示例
+## Usage Examples
 
-### 基础文生视频
+### Basic Text-to-Video
 
 ```json
 {
@@ -23,7 +23,7 @@
 }
 ```
 
-### 启用智能改写
+### With Prompt Enhancement
 
 ```json
 {
@@ -38,11 +38,11 @@
 }
 ```
 
-## 重要说明
+## Important Notes
 
-> **智能改写**: 启用 `prompt_extend: true` 可以让模型自动优化你的提示词，提升生成效果
-> **时长选项**: 可选 5 秒或 10 秒，默认 5 秒
-> **有声视频**: 默认生成有声视频（自动配音），可通过 `audio_url` 自定义音频
-> **提示词长度**: 最长 1500 字符
-> **处理时间**: 通常 1-5 分钟
-> **视频有效期**: 24 小时，请及时下载
+> **Prompt Enhancement**: Enable `prompt_extend: true` to automatically optimize your prompt for better results
+> **Duration Options**: Choose 5 or 10 seconds, defaults to 5 seconds
+> **Audio Support**: Generates videos with audio by default (auto-dubbing), customize via `audio_url`
+> **Prompt Length**: Maximum 1500 characters
+> **Processing Time**: Typically 1-5 minutes
+> **Video Expiration**: 24 hours, download promptly
