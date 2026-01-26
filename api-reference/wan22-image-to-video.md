@@ -5,17 +5,6 @@
 - **wan2.2-i2v-flash**: 快速版本，支持 480P/720P 分辨率
 - **wan2.2-i2v-plus**: 增强版本，支持 480P/1080P 分辨率
 
-## 模型特性
-
-### wan2.2-i2v-flash（快速版）
-- 支持 480P、720P（默认 720P），固定 5 秒，不支持音频
-
-### wan2.2-i2v-plus（增强版）
-- 支持 480P、1080P（默认 1080P），固定 5 秒，不支持音频
-
-### 共同特性
-- 提示词最长 800 字符，通过文本控制画面运动
-
 ## API 端点
 
 {% openapi src="../.gitbook/assets/openapi-tongyi-wanxiang.yaml" path="/v1/task/create" method="post" %}

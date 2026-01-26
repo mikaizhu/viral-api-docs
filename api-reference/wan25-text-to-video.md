@@ -2,16 +2,6 @@
 
 使用 `wan2.5-t2v-preview` 模型将文本描述转换为高质量视频。
 
-## 模型特性
-
-- 支持 5/10 秒时长（默认 5 秒），默认分辨率 1920*1080（1080P）
-- 提示词最长 1500 字符，支持智能改写（`prompt_extend`）
-- 默认生成有声视频（自动配音），支持自定义音频
-
-## 版本优势
-
-相比 Wan2.2：更高质量、支持智能改写、可选时长、有声视频
-
 ## API 端点
 
 {% openapi src="../.gitbook/assets/openapi-tongyi-wanxiang.yaml" path="/v1/task/create" method="post" %}

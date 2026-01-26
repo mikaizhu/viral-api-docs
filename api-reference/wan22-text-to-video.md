@@ -2,11 +2,6 @@
 
 使用 `wan2.2-t2v-plus` 模型将文本描述转换为视频。
 
-## 模型特性
-
-- 固定时长 5 秒，默认分辨率 1920*1080（1080P）
-- 提示词最长 800 字符，不支持音频
-
 ## API 端点
 
 {% openapi src="../.gitbook/assets/openapi-tongyi-wanxiang.yaml" path="/v1/task/create" method="post" %}
