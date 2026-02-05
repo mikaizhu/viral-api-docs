@@ -55,9 +55,9 @@ paths:
                   enum:
                     - claude-opus-4-20250514
                     - claude-sonnet-4-20250514
-                    - claude-3-5-sonnet-20241022
+                    - claude-opus-4-5-20251101
                     - claude-3-5-haiku-20241022
-                  example: claude-3-5-sonnet-20241022
+                  example: claude-opus-4-5-20251101
                 max_tokens:
                   type: integer
                   description: 最大输出 token 数（必填）
@@ -150,7 +150,7 @@ paths:
                   items:
                     type: string
             example:
-              model: claude-3-5-sonnet-20241022
+              model: claude-opus-4-5-20251101
               max_tokens: 4096
               messages:
                 - role: user
@@ -167,7 +167,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponse'
+                $ref: "#/components/schemas/MessageResponse"
               example:
                 id: "msg_01XFDUDYJgAACzvnptvVoYEL"
                 type: message
@@ -175,19 +175,19 @@ paths:
                 content:
                   - type: text
                     text: "你好！我是 Claude，一个由 Anthropic 开发的 AI 助手。我可以帮助你完成各种任务，包括回答问题、分析内容、编写代码等。有什么我可以帮助你的吗？"
-                model: claude-3-5-sonnet-20241022
+                model: claude-opus-4-5-20251101
                 stop_reason: end_turn
                 usage:
                   input_tokens: 12
                   output_tokens: 85
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: '#/components/responses/Forbidden'
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: '#/components/responses/ServerError'
+          $ref: "#/components/responses/ServerError"
 
 components:
   securitySchemes:
@@ -233,7 +233,7 @@ components:
         model:
           type: string
           description: 使用的模型名称
-          example: claude-3-5-sonnet-20241022
+          example: claude-opus-4-5-20251101
         stop_reason:
           type: string
           description: 停止原因
@@ -281,7 +281,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             code: 400
             error:
@@ -292,7 +292,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             code: 401
             error:
@@ -303,7 +303,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             code: 403
             error:
@@ -314,7 +314,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             code: 500
             error:
