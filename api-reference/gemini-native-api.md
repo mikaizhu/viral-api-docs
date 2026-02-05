@@ -1,6 +1,6 @@
 # Gemini Native API
 
-Gemini 原生 API 接口，支持文本生成、多轮对话、图片理解、PDF 分析等多模态能力。
+Gemini Native API supports text generation, multi-turn conversations, image understanding, PDF analysis, and multimodal capabilities.
 
 ## Generate Content
 

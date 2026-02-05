@@ -1,37 +1,37 @@
 # Veo Video Generation API
 
-Gemini Veo 视频生成 API，支持文生视频、图生视频、帧插值和参考图片等功能。
+Gemini Veo video generation API supports text-to-video, image-to-video, frame interpolation, and reference images.
 
-## 支持的模型
+## Supported Models
 
-| 模型 | 版本 | 速度 | 音频 | 图生视频 | 帧插值 | 参考图片 |
+| Model | Version | Speed | Audio | Image-to-Video | Frame Interpolation | Reference Images |
 |------|------|------|------|----------|--------|----------|
-| `veo-2.0-generate-001` | 2.0 | 标准 | ❌ | ✅ 单图 | ❌ | ❌ |
-| `veo-3.0-generate-001` | 3.0 | 标准 | ✅ | ✅ 单图 | ❌ | ❌ |
-| `veo-3.0-fast-generate-001` | 3.0 | 快速 | ✅ | ✅ 单图 | ❌ | ❌ |
-| `veo-3.1-generate-preview` | 3.1 | 标准 | ✅ | ✅ 单图 | ✅ 双图 | ✅ 最多3张 |
-| `veo-3.1-fast-generate-preview` | 3.1 | 快速 | ✅ | ✅ 单图 | ✅ 双图 | ✅ 最多3张 |
+| `veo-2.0-generate-001` | 2.0 | Standard | ❌ | ✅ Single | ❌ | ❌ |
+| `veo-3.0-generate-001` | 3.0 | Standard | ✅ | ✅ Single | ❌ | ❌ |
+| `veo-3.0-fast-generate-001` | 3.0 | Fast | ✅ | ✅ Single | ❌ | ❌ |
+| `veo-3.1-generate-preview` | 3.1 | Standard | ✅ | ✅ Single | ✅ Dual | ✅ Up to 3 |
+| `veo-3.1-fast-generate-preview` | 3.1 | Fast | ✅ | ✅ Single | ✅ Dual | ✅ Up to 3 |
 
-## 使用模式
+## Usage Modes
 
-| 模式 | images 数量 | referenceImages | 时长要求 | 模型要求 |
+| Mode | images Count | referenceImages | Duration | Model Requirement |
 |------|------------|-----------------|----------|----------|
-| 文生视频 | 0 | 可选 0-3 张* | 4/6/8秒 | 所有版本 |
-| 图生视频 | 1 | 可选 0-3 张* | 4/6/8秒 | 所有版本 |
-| 帧插值 | 2 | **不支持** | **仅8秒** | **仅 Veo 3.1** |
+| Text-to-Video | 0 | Optional 0-3* | 4/6/8s | All versions |
+| Image-to-Video | 1 | Optional 0-3* | 4/6/8s | All versions |
+| Frame Interpolation | 2 | **Not supported** | **8s only** | **Veo 3.1 only** |
 
-> **重要限制**：帧插值（2张images）和参考图片（referenceImages）功能互斥，不能同时使用。参考图片功能仅 Veo 3.1 支持。
+> **Important Limitation**: Frame interpolation (2 images) and reference images (referenceImages) are mutually exclusive and cannot be used together. Reference images feature is only supported by Veo 3.1.
 
 ## Create Video Generation Task
 
-创建视频生成任务，返回 task_id 用于后续查询。
+Create a video generation task, returns task_id for subsequent queries.
 
 {% openapi src="../.gitbook/assets/openapi-veo.yaml" path="/v1/videos" method="post" %}
 {% endopenapi %}
 
 ## Query Video Task Status
 
-查询视频生成任务的状态和结果。建议轮询间隔 5 秒。
+Query the status and results of a video generation task. Recommended polling interval: 5 seconds.
 
 {% openapi src="../.gitbook/assets/openapi-veo.yaml" path="/v1/videos/{task_id}" method="get" %}
 {% endopenapi %}

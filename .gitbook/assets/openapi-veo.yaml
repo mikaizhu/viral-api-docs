@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Veo Video Generation API
-  description: Gemini Veo 视频生成 API，支持文生视频、图生视频、帧插值和参考图片等功能。Veo 3.0+ 支持音频输出，Veo 3.1 支持帧插值和参考图片功能。
+  description: Gemini Veo video generation API supports text-to-video, image-to-video, frame interpolation, and reference images. Veo 3.0+ supports audio output. Veo 3.1 adds frame interpolation and reference image capabilities.
   version: 1.0.0
   contact:
     name: ViralAPI Support
@@ -16,7 +16,7 @@ security:
 
 tags:
   - name: Veo
-    description: Veo 视频生成 API，支持多种视频生成模式
+    description: Veo video generation API with multiple generation modes
 
 paths:
   /v1/videos:
@@ -24,7 +24,7 @@ paths:
       tags:
         - Veo
       summary: Create Video Generation Task
-      description: 创建视频生成任务，支持文生视频、图生视频、帧插值等模式。返回 task_id 用于查询任务状态。
+      description: Create video generation task with text-to-video, image-to-video, or frame interpolation modes. Returns task_id for status queries.
       operationId: createVideoTask
       security:
         - BearerAuth: []
@@ -40,7 +40,7 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 模型名称。Veo 2.0 支持基础功能；Veo 3.0+ 支持音频输出；Veo 3.1 额外支持帧插值和参考图片
+                  description: Model name. Veo 2.0 supports basic features; Veo 3.0+ adds audio output; Veo 3.1 adds frame interpolation and reference images
                   enum:
                     - veo-2.0-generate-001
                     - veo-3.0-generate-001
@@ -49,47 +49,47 @@ paths:
                     - veo-3.1-fast-generate-preview
                 prompt:
                   type: string
-                  description: 视频生成的文本描述（最多 1024 个词元）
+                  description: Text description for video generation (max 1024 tokens)
                   maxLength: 4096
                 images:
                   type: array
-                  description: 图片数组。1 张图片用于图生视频（作为首帧）；2 张图片用于帧插值（首尾帧，仅 Veo 3.1 支持）
+                  description: Image array. 1 image for image-to-video (as first frame); 2 images for frame interpolation (first and last frames, Veo 3.1 only)
                   items:
                     type: string
-                    description: 图片数据，支持 HTTP(S) URL、Base64 字符串或 Data URI
+                    description: Image data. Supports HTTP(S) URL, Base64 string, or Data URI
                   minItems: 1
                   maxItems: 2
                 metadata:
                   type: object
-                  description: 高级配置参数
+                  description: Advanced configuration parameters
                   properties:
                     aspectRatio:
                       type: string
-                      description: 视频宽高比
+                      description: Video aspect ratio
                       enum:
                         - "16:9"
                         - "9:16"
                     durationSeconds:
                       type: integer
-                      description: 视频时长（秒）。帧插值模式下必须为 8
+                      description: Video duration in seconds. Must be 8 for frame interpolation mode
                       enum:
                         - 4
                         - 6
                         - 8
                     negativePrompt:
                       type: string
-                      description: 负面提示词，描述不想要的元素
+                      description: Negative prompt describing unwanted elements
                     personGeneration:
                       type: string
-                      description: 人物生成策略。仅支持 allow_adult，不支持 allow_all
+                      description: Person generation strategy. Only allow_adult is supported, allow_all is not supported
                       enum:
                         - allow_adult
                     resolution:
                       type: string
-                      description: 视频分辨率（具体值参考 Gemini 官方文档）
+                      description: Video resolution (refer to Gemini official documentation for specific values)
                     referenceImages:
                       type: array
-                      description: 参考图片数组（仅 Veo 3.1 支持，最多 3 张）。用于引导视频风格，不会直接出现在视频中。注意：不能与帧插值（2张images）同时使用
+                      description: "Reference image array (Veo 3.1 only, max 3 images). Guides video style without appearing directly in the video. Note: Cannot be used with frame interpolation (2 images)"
                       maxItems: 3
                       items:
                         type: object
@@ -99,10 +99,10 @@ paths:
                             properties:
                               bytesBase64Encoded:
                                 type: string
-                                description: 图片数据，支持 Base64 字符串、HTTP(S) URL 或 Data URI
+                                description: Image data. Supports Base64 string, HTTP(S) URL, or Data URI
                               mimeType:
                                 type: string
-                                description: 图片 MIME 类型（可选）
+                                description: Image MIME type (optional)
                                 enum:
                                   - image/jpeg
                                   - image/png
@@ -110,18 +110,18 @@ paths:
                                   - image/webp
                           referenceType:
                             type: string
-                            description: 参考类型，仅支持 asset
+                            description: Reference type. Only asset is supported
                             enum:
                               - asset
             example:
               model: veo-3.0-generate-001
-              prompt: "一只可爱的橘猫在阳光明媚的花园里追逐蝴蝶，慢动作镜头，电影级画质"
+              prompt: "A cute orange cat chasing butterflies in a sunny garden, slow motion, cinematic quality"
               metadata:
                 aspectRatio: "16:9"
                 durationSeconds: 6
       responses:
         "200":
-          description: 任务创建成功
+          description: Task created successfully
           content:
             application/json:
               schema:
@@ -151,7 +151,7 @@ paths:
       tags:
         - Veo
       summary: Query Video Task Status
-      description: 查询视频生成任务的状态和结果。任务完成后返回视频下载 URL。
+      description: Query video generation task status and results. Returns video download URL when task completes.
       operationId: queryVideoTask
       security:
         - BearerAuth: []
@@ -159,33 +159,33 @@ paths:
         - name: task_id
           in: path
           required: true
-          description: 任务 ID（从创建任务接口返回）
+          description: Task ID (returned from create task endpoint)
           schema:
             type: string
           example: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
       responses:
         "200":
-          description: 查询成功
+          description: Query successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VideoQueryResponse'
               examples:
                 in_progress:
-                  summary: 处理中
+                  summary: In Progress
                   value:
                     task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
                     status: "in_progress"
                     progress: "50%"
                 success:
-                  summary: 生成成功
+                  summary: Generation Successful
                   value:
                     task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
                     status: "success"
                     progress: "100%"
                     url: "https://viralapi.ai/v1/videos/dmlkZW9fdGFzay0xMjM0NTY3ODkw/content"
                 failure:
-                  summary: 生成失败
+                  summary: Generation Failed
                   value:
                     task_id: "dmlkZW9fdGFzay0xMjM0NTY3ODkw"
                     status: "failure"
@@ -204,7 +204,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: 使用 Bearer Token 进行认证。获取 API Key 请访问 https://viralapi.ai/api-key
+      description: Authenticate using Bearer Token. Get API Key at https://viralapi.ai/api-key
 
   schemas:
     VideoTaskResponse:
@@ -212,24 +212,24 @@ components:
       properties:
         id:
           type: string
-          description: 任务 ID
+          description: Task ID
         task_id:
           type: string
-          description: 任务 ID（与 id 相同）
+          description: Task ID (same as id)
         object:
           type: string
-          description: 对象类型
+          description: Object type
           enum:
             - video.generation
         created_at:
           type: integer
-          description: 创建时间戳（Unix 秒）
+          description: Creation timestamp (Unix seconds)
         model:
           type: string
-          description: 使用的模型名称
+          description: Model name used
         status:
           type: string
-          description: 任务状态
+          description: Task status
           enum:
             - queued
             - in_progress
@@ -241,10 +241,10 @@ components:
       properties:
         task_id:
           type: string
-          description: 任务 ID
+          description: Task ID
         status:
           type: string
-          description: "任务状态：queued (排队中)、in_progress (处理中)、success (成功)、failure (失败)"
+          description: "Task status: queued (queued), in_progress (processing), success (completed), failure (failed)"
           enum:
             - queued
             - in_progress
@@ -252,14 +252,14 @@ components:
             - failure
         progress:
           type: string
-          description: 进度百分比
+          description: Progress percentage
         url:
           type: string
-          description: 视频下载 URL（status 为 success 时返回）
+          description: Video download URL (returned when status is success)
           format: uri
         fail_reason:
           type: string
-          description: 失败原因（status 为 failure 时返回）
+          description: Failure reason (returned when status is failure)
 
     ErrorResponse:
       type: object
@@ -269,7 +269,7 @@ components:
       properties:
         code:
           type: integer
-          description: HTTP 状态码
+          description: HTTP status code
         error:
           type: object
           required:
@@ -278,17 +278,17 @@ components:
           properties:
             message:
               type: string
-              description: 错误描述
+              description: Error message
             type:
               type: string
-              description: 错误类型标识
+              description: Error type identifier
             param:
               type: string
-              description: 导致错误的参数名称（可选）
+              description: Parameter name that caused the error (optional)
 
   responses:
     BadRequest:
-      description: 请求参数错误
+      description: Invalid request parameters
       content:
         application/json:
           schema:
@@ -299,7 +299,7 @@ components:
               message: "Invalid request parameters"
               type: invalid_request_error
     Unauthorized:
-      description: 认证失败
+      description: Authentication failed
       content:
         application/json:
           schema:
@@ -310,7 +310,7 @@ components:
               message: "Invalid or expired token"
               type: authentication_error
     PaymentRequired:
-      description: 余额不足
+      description: Insufficient account balance
       content:
         application/json:
           schema:
@@ -321,7 +321,7 @@ components:
               message: "Insufficient account balance"
               type: payment_required
     Forbidden:
-      description: 权限不足
+      description: Insufficient permissions
       content:
         application/json:
           schema:
@@ -332,7 +332,7 @@ components:
               message: "Access denied for this model"
               type: permission_error
     NotFound:
-      description: 任务不存在
+      description: Task not found
       content:
         application/json:
           schema:
@@ -344,7 +344,7 @@ components:
               type: not_found_error
               param: task_id
     ServerError:
-      description: 服务器内部错误
+      description: Internal server error
       content:
         application/json:
           schema:
@@ -355,7 +355,7 @@ components:
               message: "Internal server error"
               type: server_error
     BadGateway:
-      description: 网关错误
+      description: Gateway error
       content:
         application/json:
           schema:
